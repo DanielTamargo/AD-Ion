@@ -10,7 +10,7 @@ public class Main {
     public static void main(String[] args) {
 
         //Abrir la BD
-        ObjectContainer db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), BDPer);
+        ObjectContainer db= Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(),BDPer);
 
         // Creamos Personas
         Persona p1 = new Persona("Juan", "Guadalajara");
@@ -23,8 +23,11 @@ public class Main {
         db.store(p2);
         db.store(p3);
         db.store(p4);
-        db.close(); //cerrar base de datos
+
+        System.out.println("¡Personas guardadas con éxito!");
+
+        // Cerrar base de datos
+        db.close();
+
     }
-
 }
-
