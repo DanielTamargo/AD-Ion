@@ -1,4 +1,4 @@
-package com.tamargo;
+package com.tamargo.version2;
 
 public class Departamento2 {
 

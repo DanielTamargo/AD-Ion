@@ -1,4 +1,4 @@
-package com.tamargo;
+package com.tamargo.version1;
 
 import com.db4o.Db4oEmbedded;
 import com.db4o.ObjectContainer;

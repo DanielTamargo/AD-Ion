@@ -1,4 +1,4 @@
-package com.tamargo;
+package com.tamargo.version2;
 
 import com.db4o.Db4oEmbedded;
 import com.db4o.ObjectContainer;
@@ -56,7 +56,7 @@ public class Actividad5v2 {
         db.store(d2);
         db.store(d3);
 
-        // Almacenamos los empleados (daría igual insertarlos antes que los departamentos porque no relaciona)
+        // Almacenamos los empleados
         db.store(e1);
         db.store(e2);
         db.store(e3);
@@ -103,7 +103,7 @@ public class Actividad5v2 {
         }
         while (result.hasNext()) {
             Departamento2 dep = result.next();
-            System.out.println("Departamento: " + dep.getNombre());
+            System.out.println("Departamento: " + dep.getNombre() + " (" + dep.getNumDep() + ")");
             System.out.println("Empleados:");
             Empleado2 e = new Empleado2 (null, null, null, dep);
             ObjectSet<Empleado2> result1 = db.queryByExample(e);
