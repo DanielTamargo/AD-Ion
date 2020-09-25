@@ -34,6 +34,12 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
+  <component name="PropertiesComponent">
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../../../Descargas/Drivers BBDD con Java (JDBC)/mysql-connector-java-8.0.11.jar" />
+    <property name="project.structure.last.edited" value="Libraries" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.2" />
+  </component>
   <component name="RunManager">
     <configuration name="Main" type="Application" factoryName="Application" temporary="true">
       <option name="MAIN_CLASS_NAME" value="com.tamargo.Main" />
@@ -45,6 +51,11 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.Main" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -67,5 +78,32 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="706" y="98" key="#Project_Structure" timestamp="1601056080403">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="706" y="98" key="#Project_Structure/0.0.1920.1040@0.0.1920.1040" timestamp="1601056080403" />
+    <state x="932" y="265" key="FileChooserDialogImpl" timestamp="1601056076589">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="932" y="265" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1601056076589" />
+    <state width="1879" height="279" key="GridCell.Tab.0.bottom" timestamp="1601058559154">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1879" height="279" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1601058559154" />
+    <state width="1879" height="279" key="GridCell.Tab.0.center" timestamp="1601058559154">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1879" height="279" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1601058559154" />
+    <state width="1879" height="279" key="GridCell.Tab.0.left" timestamp="1601058559154">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1879" height="279" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1601058559154" />
+    <state width="1879" height="279" key="GridCell.Tab.0.right" timestamp="1601058559154">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1879" height="279" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1601058559154" />
   </component>
 </project>
