@@ -1,0 +1,50 @@
+CREATE TABLE departamentos (
+  dept_no int(11) NOT NULL,
+  dnombre varchar(45) DEFAULT NULL,
+  loc varchar(45) DEFAULT NULL,
+  PRIMARY KEY (dept_no)
+);
+
+CREATE TABLE empleados (
+  emp_no int(11) NOT NULL,
+  apellido varchar(45) DEFAULT NULL,
+  oficio varchar(45) DEFAULT NULL,
+  dir int(11) DEFAULT NULL,
+  fecha_alt date DEFAULT NULL,
+  salario float DEFAULT NULL,
+  comision float DEFAULT NULL,
+  dept_no int(11) DEFAULT NULL,
+  PRIMARY KEY (emp_no),
+  KEY fk_Empleados_Departamentos_idx (dept_no),
+  CONSTRAINT fk_Empleados_Departamentos FOREIGN KEY (dept_no) REFERENCES departamentos (dept_no) ON DELETE NO ACTION ON UPDATE NO ACTION
+);
+
+DESCRIBE departamentos;
+DESCRIBE empleados;
+
+commit;
+
+DELETE FROM empleados;
+DELETE FROM departamentos;
+
+INSERT INTO departamentos VALUES(1, 'Administración', 'Vitoria');
+INSERT INTO departamentos VALUES(2, 'Informática', 'Vitoria');
+INSERT INTO departamentos VALUES(3, 'Biología', 'Bilbao');
+INSERT INTO departamentos VALUES(4, 'Limpieza', 'Barcelona');
+
+INSERT INTO empleados VALUES(1, 'Tamargo', 'Director', 01010 , 23/01/2019, 2000, 20, 1);
+INSERT INTO empleados VALUES(2, 'Ortiz', 'RRHH', 01017 , 14/02/2019, 1200, 20, 1);
+INSERT INTO empleados VALUES(3, 'Fernandez', 'Empleado', 01012 , 18/10/2019, 1000, 20, 1);
+INSERT INTO empleados VALUES(4, 'Gonzalez', 'Empleado', 01012 , 18/10/2019, 1000, 20, 1);
+
+INSERT INTO empleados VALUES(5, 'Mendez', 'Director', 01011 , 20/03/2019, 2000, 30, 2);
+INSERT INTO empleados VALUES(6, 'Ruiz', 'RRHH', 01015 , 30/04/2019, 1200, 10, 2);
+INSERT INTO empleados VALUES(7, 'Morales', 'Empleado', 01018 , 11/05/2019, 1000, 10, 2);
+
+INSERT INTO empleados VALUES(8, 'Blanco', 'Director', 01019 , 23/09/2019, 2000, 5, 3);
+INSERT INTO empleados VALUES(9, 'Parker', 'RRHH', 01012 , 11/09/2019, 1200, 5, 3);
+INSERT INTO empleados VALUES(10, 'Mendez', 'Empleado', 01013 , 15/09/2019, 1000, 5, 3);
+
+INSERT INTO empleados VALUES(11, 'Zugasti', 'Director', 01013 , 04/05/2019, 2000, 10, 4);
+INSERT INTO empleados VALUES(12, 'Perez', 'RRHH', 01013 , 18/06/2019, 1200, 10, 2);
+INSERT INTO empleados VALUES(13, 'Rock', 'Empleado', 01013 , 05/07/2019, 1000, 10, 4);
