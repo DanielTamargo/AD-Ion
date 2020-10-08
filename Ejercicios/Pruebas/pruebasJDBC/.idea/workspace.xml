@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="BranchesTreeState">
     <expand>
       <path>
@@ -25,6 +28,13 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../../.." />
   </component>
@@ -35,10 +45,11 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../Recursos/sqlite-jdbc-3.7.2.jar" />
-    <property name="project.structure.last.edited" value="Libraries" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/recursos/mysql-connector-java-8.0.11.jar" />
+    <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
-    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="project.structure.side.proportion" value="0.23563218" />
+    <property name="settings.editor.selected.configurable" value="configurable.group.build" />
   </component>
   <component name="RunManager">
     <configuration name="Main" type="Application" factoryName="Application" temporary="true">
@@ -81,14 +92,14 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="706" y="98" key="#Project_Structure" timestamp="1601407043145">
+    <state x="706" y="98" key="#Project_Structure" timestamp="1602176667854">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="706" y="98" key="#Project_Structure/0.0.1920.1040@0.0.1920.1040" timestamp="1601407043145" />
-    <state x="932" y="265" key="FileChooserDialogImpl" timestamp="1601407037814">
+    <state x="706" y="98" key="#Project_Structure/0.0.1920.1040@0.0.1920.1040" timestamp="1602176667854" />
+    <state x="932" y="265" key="FileChooserDialogImpl" timestamp="1602176654993">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="932" y="265" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1601407037814" />
+    <state x="932" y="265" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1602176654993" />
     <state width="1465" height="349" key="GridCell.Tab.0.bottom" timestamp="1601409699939">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -105,5 +116,13 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1465" height="349" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1601409699939" />
+    <state x="539" y="175" key="SettingsEditor" timestamp="1602176106098">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="539" y="175" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1602176106098" />
+    <state x="420" y="151" key="new project wizard" timestamp="1602176322270">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="420" y="151" key="new project wizard/0.0.1920.1040@0.0.1920.1040" timestamp="1602176322270" />
   </component>
 </project>

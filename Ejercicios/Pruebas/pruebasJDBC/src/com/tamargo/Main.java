@@ -18,10 +18,12 @@ public class Main {
 
     public static void conexionSQLite() {
         try {
-            //Cargar el driver
+            Connection conexion = new Conexiones().conexionSQlite();
+
+            /*//Cargar el driver
             Class.forName("org.sqlite.JDBC");
             // Establecemos la conexion con la BD
-            Connection conexion = DriverManager.getConnection("jdbc:sqlite:sqlite.db");
+            Connection conexion = DriverManager.getConnection("jdbc:sqlite:sqlite.db");*/
 
             // Preparamos la consulta
             Statement sentencia = conexion.createStatement();
@@ -49,9 +51,6 @@ public class Main {
 
             conexion.close();//Cerrar conexion
 
-
-        } catch (ClassNotFoundException cn) {
-            cn.printStackTrace();
         } catch (SQLException e) {
             e.printStackTrace();
         }
