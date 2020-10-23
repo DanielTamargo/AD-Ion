@@ -85,6 +85,7 @@ Temporary Items
 .idea/**/dictionaries
 .idea/**/shelf
 /**/workspace.xml
+/**/.idea/workspace.xml
 
 # Generated files
 .idea/**/contentModel.xml
