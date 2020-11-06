@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+    <class name="com.company.EmpleadosEntity" table="empleados" schema="tema3">
+        <id name="empNo">
+            <column name="emp_no" sql-type="int"/>
+        </id>
+        <property name="apellido">
+            <column name="apellido" sql-type="varchar(45)" length="45" not-null="true"/>
+        </property>
+        <property name="oficio">
+            <column name="oficio" sql-type="varchar(45)" length="45" not-null="true"/>
+        </property>
+        <property name="dir">
+            <column name="dir" sql-type="int" not-null="true"/>
+        </property>
+        <property name="fechaAlt">
+            <column name="fecha_alt" sql-type="date" not-null="true"/>
+        </property>
+        <property name="salario">
+            <column name="salario" sql-type="float" precision="-1" not-null="true"/>
+        </property>
+        <property name="comision">
+            <column name="comision" sql-type="float" precision="-1" not-null="true"/>
+        </property>
+        <many-to-one name="departamentosByDeptNo" class="com.company.DepartamentosEntity">
+            <column name="dept_no" not-null="true"/>
+        </many-to-one>
+    </class>
+</hibernate-mapping>
