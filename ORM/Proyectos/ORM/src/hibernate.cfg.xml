@@ -4,14 +4,19 @@
     "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
   <session-factory>
-    <property name="connection.url">jdbc:mysql://localhost:3306</property>
+    <property name="connection.url">jdbc:mysql://localhost:3306/tema3?useSSL=false&amp;allowPublicKeyRetrieval=true&amp;useUnicode=true&amp;useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=UTC</property>
     <property name="connection.driver_class">com.mysql.cj.jdbc.Driver</property>
-    <!-- <property name="connection.username"/> -->
-    <!-- <property name="connection.password"/> -->
+
+    <property name="dialect">
+      org.hibernate.dialect.H2Dialect
+    </property>
+    <property name="connection.username">root</property>
+    <property name="connection.password">12345Abcde</property>
+
+    <mapping class="com.company.DepartamentosEntity"/>
     <mapping resource="DepartamentosEntityhbm.xml"/>
-      <mapping class="com.company.DepartamentosEntity"/>
-    <mapping resource="EmpleadosEntityhbm.xml"/>
     <mapping class="com.company.EmpleadosEntity"/>
+    <mapping resource="EmpleadosEntityhbm.xml"/>
 
     <!-- DB schema will be updated if needed -->
     <!-- <property name="hibernate.hbm2ddl.auto">update</property> -->

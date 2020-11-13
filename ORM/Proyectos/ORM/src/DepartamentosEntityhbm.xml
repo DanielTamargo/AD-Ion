@@ -14,7 +14,7 @@
         <property name="loc">
             <column name="loc" sql-type="varchar(45)" length="45" not-null="true"/>
         </property>
-        <set name="empleadosByDeptNo" inverse="true">
+        <set name="empleadosByDeptNo" cascade="delete" inverse="true">
             <key>
                 <column name="dept_no" not-null="true"/>
             </key>
