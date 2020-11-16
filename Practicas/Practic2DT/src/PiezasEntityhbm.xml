@@ -17,7 +17,7 @@
         <property name="descripcion">
             <column name="descripcion" sql-type="text" not-null="true"/>
         </property>
-        <set name="gestionsByCodigo" inverse="true">
+        <set name="gestionsByCodigo" cascade="delete" inverse="true">
             <key>
                 <column name="codPieza"/>
             </key>

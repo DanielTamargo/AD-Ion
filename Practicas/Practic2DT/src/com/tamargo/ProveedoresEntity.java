@@ -5,13 +5,24 @@ import java.util.Collection;
 import java.util.Objects;
 
 @Entity
-@Table(name = "proveedores", schema = "practica2dt", catalog = "")
+@Table(name = "proveedores", schema = "practica2dt", catalog = "practica2dt")
 public class ProveedoresEntity {
     private String codigo;
     private String nombre;
     private String apellidos;
     private String direccion;
     private Collection<GestionEntity> gestionsByCodigo;
+
+    public void actualizarDatos(ProveedoresEntity prov) {
+        this.nombre = prov.getNombre();
+        this.apellidos = prov.getApellidos();
+        this.direccion = prov.getDireccion();
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%5s | %s, %s", codigo, apellidos, nombre);
+    }
 
     @Id
     @Column(name = "codigo", nullable = false, length = 6)

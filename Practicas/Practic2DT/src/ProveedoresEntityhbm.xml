@@ -17,7 +17,7 @@
         <property name="direccion">
             <column name="direccion" sql-type="varchar(40)" length="40"/>
         </property>
-        <set name="gestionsByCodigo" inverse="true">
+        <set name="gestionsByCodigo" cascade="delete" inverse="true">
             <key>
                 <column name="codProveedor"/>
             </key>

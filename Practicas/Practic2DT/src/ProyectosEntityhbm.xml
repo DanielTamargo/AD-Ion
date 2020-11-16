@@ -14,7 +14,7 @@
         <property name="ciudad">
             <column name="ciudad" sql-type="varchar(40)" length="40" not-null="true"/>
         </property>
-        <set name="gestionsByCodigo" inverse="true">
+        <set name="gestionsByCodigo" cascade="delete" inverse="true">
             <key>
                 <column name="codProyecto"/>
             </key>
