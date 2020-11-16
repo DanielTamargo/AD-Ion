@@ -5,12 +5,17 @@ import java.util.Collection;
 import java.util.Objects;
 
 @Entity
-@Table(name = "proyectos", schema = "practica2dt", catalog = "")
+@Table(name = "proyectos", schema = "practica2dt", catalog = "practica2dt")
 public class ProyectosEntity {
     private String codigo;
     private String nombre;
     private String ciudad;
     private Collection<GestionEntity> gestionsByCodigo;
+
+    public void actualizarDatos(ProyectosEntity proy) {
+        this.nombre = proy.getNombre();
+        this.ciudad = proy.getCiudad();
+    }
 
     @Id
     @Column(name = "codigo", nullable = false, length = 6)

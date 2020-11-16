@@ -21,7 +21,7 @@ public class ProveedoresEntity {
 
     @Override
     public String toString() {
-        return String.format("%5s | %s, %s", codigo, apellidos, nombre);
+        return String.format("%6s | %s, %s", codigo, apellidos, nombre);
     }
 
     @Id
