@@ -10,6 +10,8 @@ import com.tamargo.util.InsertarEditarDatos;
 import org.hibernate.ObjectNotFoundException;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
@@ -42,6 +44,8 @@ public class VentanaPrincipal {
     private JTextField t_provApe;
     private JTextField t_provDir;
     private JLabel l_paginas;
+
+    private ArrayList<ProveedoresEntity> proveedoresComboBox = new ArrayList<>();
 
     // Piezas
     private JList<PiezasEntity> listaPiezas;
@@ -510,6 +514,124 @@ public class VentanaPrincipal {
         cargarDatosProveedor();
         System.out.println("  Ventana cargada\n");
     }
+    public void cargarVentanaProveedorBuscar(int tipo) { // 1 -> codigo, 2 -> nombre, 3 -> direccion
+        System.out.println("  Cargando datos");
+        proveedores = CargarDatos.proveedores();
+        System.out.println("  Datos cargados (num datos: " + proveedores.size() + ")");
+        System.out.println("  Cargando ventana");
+        try {
+            panelDatos.removeAll();
+            panelDatos.repaint();
+        } catch (Exception ignored) { }
+
+        panelDatos.setLayout(null);
+        confPanel(panelDatos);
+
+        String texto = "Búsqueda";
+        if (tipo == 1)
+            texto = "Introduce el código o parte del código para buscar";
+        else if (tipo == 2)
+            texto = "Introduce el nombre o parte del nombre para buscar";
+        else if (tipo == 3)
+            texto = "Introduce la dirección o parte de la dirección para buscar";
+
+        JLabel l_textoBuscar = new JLabel(texto, SwingConstants.CENTER);
+        panelDatos.add(l_textoBuscar);
+        l_textoBuscar.setBounds(0, 50, dimPanelDatos.width, dimLabel.height);
+        l_textoBuscar.setFont(new Font("SegoeUI", Font.BOLD, 12));
+
+        JTextField t_provBusqueda = new JTextField();
+        confTextField(t_provBusqueda);
+        panelDatos.add(t_provBusqueda);
+        t_provBusqueda.setBounds(((dimPanelDatos.width / 2) - (dimTextField.width / 2)), 74, dimTextField.width, dimTextField.height);
+
+        JLabel l_opcionesComboBox = new JLabel("Valores encontrados", SwingConstants.CENTER);
+        panelDatos.add(l_opcionesComboBox);
+        l_opcionesComboBox.setBounds(0, 130, dimPanelDatos.width, dimLabel.height);
+        l_opcionesComboBox.setFont(new Font("SegoeUI", Font.BOLD, 12));
+
+        JComboBox<String> comboBox = new JComboBox<String>();
+        panelDatos.add(comboBox);
+        comboBox.setBounds(((dimPanelDatos.width / 2) - (dimTextField.width / 2)), 150, dimTextField.width, dimTextField.height);
+
+        JLabel l_codProv = new JLabel("Código", SwingConstants.CENTER);
+        panelDatos.add(l_codProv);
+        l_codProv.setBounds(0, 240, dimPanelDatos.width, dimLabel.height);
+
+        JLabel l_nombre = new JLabel("Nombre", SwingConstants.CENTER);
+        panelDatos.add(l_nombre);
+        l_nombre.setBounds(0, 290, dimPanelDatos.width, dimLabel.height);
+
+        JLabel l_apellidos = new JLabel("Apellidos", SwingConstants.CENTER);
+        panelDatos.add(l_apellidos);
+        l_apellidos.setBounds(0, 340, dimPanelDatos.width, dimLabel.height);
+
+        JLabel l_direccion = new JLabel("Dirección", SwingConstants.CENTER);
+        panelDatos.add(l_direccion);
+        l_direccion.setBounds(0, 390, dimPanelDatos.width, dimLabel.height);
+
+
+        comboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                actualizarDatosOpcionesProv(comboBox, l_codProv, l_nombre, l_apellidos, l_direccion);
+            }
+        });
+        t_provBusqueda.getDocument().addDocumentListener(new DocumentListener() {
+            public void changedUpdate(DocumentEvent e) {
+                actualizarOpcionesProv(comboBox, t_provBusqueda, tipo, l_codProv, l_nombre, l_apellidos, l_direccion);
+            }
+            public void removeUpdate(DocumentEvent e) {
+                actualizarOpcionesProv(comboBox, t_provBusqueda, tipo, l_codProv, l_nombre, l_apellidos, l_direccion);
+            }
+            public void insertUpdate(DocumentEvent e) {
+                actualizarOpcionesProv(comboBox, t_provBusqueda, tipo, l_codProv, l_nombre, l_apellidos, l_direccion);
+            }
+        });
+        actualizarOpcionesProv(comboBox, t_provBusqueda, tipo, l_codProv, l_nombre, l_apellidos, l_direccion);
+        System.out.println("  Ventana cargada\n");
+    }
+    public void actualizarOpcionesProv(JComboBox<String> comboBox, JTextField busqueda, int tipo, JLabel cod, JLabel nombre, JLabel apellidos, JLabel dir) {
+        DefaultComboBoxModel<String> modelo = new DefaultComboBoxModel<>();
+        proveedoresComboBox = new ArrayList<>();
+
+        String texto = busqueda.getText().toLowerCase();
+        for (ProveedoresEntity prov: proveedores) {
+            String valor = "";
+            if (tipo == 1) {
+                valor = prov.getCodigo();
+            } else if (tipo == 2) {
+                valor = prov.getNombre();
+            } else if (tipo == 3) {
+                valor = prov.getDireccion();
+            }
+
+            if ((!valor.equalsIgnoreCase("") && valor.toLowerCase().contains(texto)) || (!valor.equalsIgnoreCase("") && texto.equalsIgnoreCase(""))) {
+                proveedoresComboBox.add(prov);
+                modelo.addElement(valor);
+            }
+        }
+        comboBox.setModel(modelo);
+        if (modelo.getSize() > 0)
+            comboBox.setSelectedIndex(0);
+        else
+            vaciarDatosOpcionesProv(cod, nombre, apellidos, dir);
+
+    }
+    public void vaciarDatosOpcionesProv(JLabel cod, JLabel nombre, JLabel apellidos, JLabel dir) {
+        cod.setText("Código");
+        nombre.setText("Nombre");
+        apellidos.setText("Apellidos");
+        dir.setText("Dirección");
+    }
+    public void actualizarDatosOpcionesProv(JComboBox<String> comboBox, JLabel cod, JLabel nombre, JLabel apellidos, JLabel dir) {
+        ProveedoresEntity prov = proveedoresComboBox.get(comboBox.getSelectedIndex());
+        cod.setText(String.format("%30s %-30s", "Código:", prov.getCodigo()));
+        nombre.setText(String.format("%30s %-30s", "Nombre:", prov.getNombre()));
+        apellidos.setText(String.format("%30s %-30s", "Apellidos:", prov.getApellidos()));
+        dir.setText(String.format("%30s %-30s", "Dirección:", prov.getDireccion()));
+    }
+
 
     // Configurar Menú
     public void menuProyectos(JMenuBar menuBar) {
@@ -626,7 +748,6 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //TODO LISTENER GESTIÓN PROVEEDORES
                 System.out.println("Proveedores: Gestión");
                 cargarVentanaProveedorGestion();
             }
@@ -640,8 +761,8 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //TODO LISTENER PROVEEDORES BÚSQUEDA POR CÓDIGO
                 System.out.println("Proveedores: Búsqueda por Código");
+                cargarVentanaProveedorBuscar(1);
             }
         });
 
@@ -650,8 +771,8 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //TODO LISTENER PROVEEDORES BÚSQUEDA POR NOMBRE
                 System.out.println("Proveedores: Búsqueda por Nombre");
+                cargarVentanaProveedorBuscar(2);
             }
         });
 
@@ -660,8 +781,8 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //TODO LISTENER PROVEEDORES BÚSQUEDA POR DIRECCIÓN
                 System.out.println("Proveedores: Búsqueda por Dirección");
+                cargarVentanaProveedorBuscar(3);
             }
         });
 
@@ -723,8 +844,6 @@ public class VentanaPrincipal {
         // Cargamos la barra de menú configurada en la ventana
         ventanaPrincipal.setJMenuBar(menuBar);
     }
-
-
 
     // Getters y Setters
     public JPanel getPanel() {
