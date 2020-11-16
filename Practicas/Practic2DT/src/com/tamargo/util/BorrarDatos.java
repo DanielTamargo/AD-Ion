@@ -17,7 +17,6 @@ public class BorrarDatos {
         try {
             return HibernateUtil.getSessionFactory();
         } catch (HibernateException ignored) {
-            // TODO LOGGER
             return null;
         }
     }
@@ -108,8 +107,8 @@ public class BorrarDatos {
                     session.delete(pza);
                     tx.commit();
 
-                    mostrarJOptionPane("Pieza Eliminado",
-                            "Pieza '" + codigoPza + "' eliminado con éxito.",
+                    mostrarJOptionPane("Pieza Eliminada",
+                            "Pieza '" + codigoPza + "' eliminada con éxito.",
                             1);
                 } catch (IllegalArgumentException ex) {
                     String mensaje = "Error al eliminar. No existe la pieza en cuestión";

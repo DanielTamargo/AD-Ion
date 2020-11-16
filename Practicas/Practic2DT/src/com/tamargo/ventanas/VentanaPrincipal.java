@@ -76,8 +76,7 @@ public class VentanaPrincipal {
     private JButton editarProyecto;
     private JTextField t_proyCod;
     private JTextField t_proyNombre;
-    private JTextField t_proyApe;
-    private JTextField t_proyDir;
+    private JTextField t_proyCiudad;
     private JLabel l_paginasProy;
     private ArrayList<ProyectosEntity> proyectosComboBox = new ArrayList<>();
 
@@ -201,6 +200,8 @@ public class VentanaPrincipal {
                     eliminarProveedor(codigo);
                 else if (tipo == 2)
                     eliminarPieza(codigo);
+                else if (tipo == 3)
+                    eliminarProyecto(codigo);
 
                 dialog.dispose();
             }
@@ -240,6 +241,42 @@ public class VentanaPrincipal {
             mostrarJOptionPane("No existen proveedores",
                     "No existe ningún proveedor en la BBDD. ¡Registra alguno!",
                     1);
+            prepararNuevoProveedor();
+            borrarProveedor.setEnabled(false);
+        }
+    }
+    public void cargarListaProyectos() {
+        DefaultListModel<ProyectosEntity> modelo = new DefaultListModel<>();
+
+        int i = 0;
+        int inicio = (indexPagProy - 1) * numProysPorPagLista;
+        int fin = inicio + numProysPorPagLista;
+
+        for (ProyectosEntity proy: proyectos) {
+            if (i >= inicio && i < fin)
+                modelo.addElement(proy);
+            i++;
+        }
+
+        double numPagsDec = (double)proyectos.size() / (double)numProysPorPagLista;
+        int numPagsEnt = proyectos.size() / numProysPorPagLista;
+
+        if (numPagsEnt < numPagsDec)
+            numPagsEnt++;
+
+        numPagsProy = numPagsEnt;
+
+        l_paginasProy.setText("Pag. " + indexPagProy + "/" + numPagsEnt);
+        vaciarDatosProyecto();
+        listaProyectos.setModel(modelo);
+        listaProyectos.setSelectedIndex(0);
+
+        if (proyectos.size() <= 0) {
+            mostrarJOptionPane("No existen proyectos",
+                    "No existe ningún proyecto en la BBDD. ¡Registra alguno!",
+                    1);
+            prepararNuevoProyecto();
+            borrarProyecto.setEnabled(false);
         }
     }
     public void cargarListaPiezas() {
@@ -272,12 +309,14 @@ public class VentanaPrincipal {
             mostrarJOptionPane("No existen piezas",
                     "No existe ninguna pieza en la BBDD. ¡Registra alguna!",
                     1);
+            prepararNuevaPieza();
+            borrarPieza.setEnabled(false);
         }
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Utilidades Piezas
-    //       Ventana gestión
+    // Ventana gestión
     public PiezasEntity construirPiezaConLosDatos() {
         String codigo = t_pzaCod.getText();
         String nombre = t_pzaNombre.getText();
@@ -303,7 +342,7 @@ public class VentanaPrincipal {
         boolean eliminado = BorrarDatos.eliminarPieza(codigo);
         if (eliminado) {
             piezas = CargarDatos.piezas();
-            if (indexPagProv * numProvsPorPagLista > piezas.size())
+            if ((indexPagProv - 1) * numProvsPorPagLista > piezas.size())
                 indexPagProv--;
             cargarListaPiezas();
         }
@@ -375,8 +414,21 @@ public class VentanaPrincipal {
 
         listaPiezas.setEnabled(true);
     }
+    public void prepararNuevaPieza() {
+        nuevaPieza.setEnabled(false);
 
-    //       Ventana búsqueda
+        borrarPieza.setEnabled(true);
+        editarPieza.setEnabled(true);
+
+        borrarPieza.setText("Cancelar");
+        editarPieza.setText("Insertar");
+
+        listaPiezas.clearSelection();
+        listaPiezas.setEnabled(false);
+        vaciarDatosPieza();
+    }
+
+    // Ventana búsqueda
     public void actualizarOpcionesPza(JComboBox<String> comboBox, JTextField busqueda, int tipo, JLabel cod, JLabel nombre, JLabel precio, JTextPane desc) {
         DefaultComboBoxModel<String> modelo = new DefaultComboBoxModel<>();
         piezasComboBox = new ArrayList<>();
@@ -417,8 +469,140 @@ public class VentanaPrincipal {
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Utilidades Proyectos
+    // Ventana gestión
+    public ProyectosEntity construirProyectoConLosDatos() {
+        String codigo = t_proyCod.getText();
+        String nombre = t_proyNombre.getText();
+        String ciudad = t_proyCiudad.getText();
+
+        ProyectosEntity proy = new ProyectosEntity();
+        proy.setCodigo(codigo);
+        proy.setNombre(nombre);
+        proy.setCiudad(ciudad);
+
+        return proy;
+    }
+    public void editarProyectoLista() {
+        ProyectosEntity proy = (ProyectosEntity) listaProyectos.getSelectedValue();
+        proy.actualizarDatos(construirProyectoConLosDatos());
+    }
+    public void addProyectoALista() {
+        proyectos.add(construirProyectoConLosDatos());
+    }
+    public void eliminarProyecto(String codigo) {
+        boolean eliminado = BorrarDatos.eliminarProyecto(codigo);
+        if (eliminado) {
+            proyectos = CargarDatos.proyectos();
+            if ((indexPagProy - 1) * numProysPorPagLista > proyectos.size())
+                indexPagProy--;
+            cargarListaProyectos();
+        }
+    }
+    public boolean comprobarDatosProyecto() {
+        boolean datosValidos = true;
+        StringBuilder datosFaltantes = new StringBuilder();
+        if (t_proyNombre.getText().equalsIgnoreCase("")) {
+            datosFaltantes.append("Nombre");
+            datosValidos = false;
+        }
+        if (t_proyCiudad.getText().equalsIgnoreCase("")) {
+            if (String.valueOf(datosFaltantes).length() > 2)
+                datosFaltantes.append(", ");
+            datosFaltantes.append("Ciudad");
+            datosValidos = false;
+        }
+
+        if (!datosValidos) {
+            mostrarJOptionPane("Faltan Datos",
+                    "Debes rellenar todos los datos obligatorios\nFaltan los siguientes datos:\n" +
+                            String.valueOf(datosFaltantes),
+                    0);
+        }
+
+        return datosValidos;
+    }
+    public void vaciarDatosProyecto() {
+        t_proyCod.setText(CargarDatos.codigoNuevo(3));
+        t_proyNombre.setText("");
+        t_proyCiudad.setText("");
+    }
+    public void cargarDatosProyecto() {
+        ProyectosEntity proy = null;
+        try {
+            proy = (ProyectosEntity) listaProyectos.getSelectedValue();
+        } catch (NullPointerException | ObjectNotFoundException ignored) { }
+
+        if (proy != null) {
+            t_proyCod.setText(proy.getCodigo());
+            t_proyNombre.setText(proy.getNombre());
+            t_proyCiudad.setText(proy.getCiudad());
+        }
+    }
+    public void reanudarVentanaProyectos() {
+        borrarProyecto.setText("Eliminar");
+        editarProyecto.setText("Editar");
+        nuevoProyecto.setEnabled(true);
+
+        listaProyectos.setEnabled(true);
+    }
+    public void prepararNuevoProyecto() {
+        nuevoProyecto.setEnabled(false);
+
+        borrarProyecto.setEnabled(true);
+        editarProyecto.setEnabled(true);
+
+        borrarProyecto.setText("Cancelar");
+        editarProyecto.setText("Insertar");
+
+        listaProyectos.clearSelection();
+        listaProyectos.setEnabled(false);
+        vaciarDatosProyecto();
+    }
+
+    // Ventana búsqueda
+    public void actualizarOpcionesProy(JComboBox<String> comboBox, JTextField busqueda, int tipo, JLabel cod, JLabel nombre, JLabel ciudad) {
+        DefaultComboBoxModel<String> modelo = new DefaultComboBoxModel<>();
+        proyectosComboBox = new ArrayList<>();
+
+        String texto = busqueda.getText().toLowerCase();
+        for (ProyectosEntity proy: proyectos) {
+            String valor = "";
+            if (tipo == 1) {
+                valor = proy.getCodigo();
+            } else if (tipo == 2) {
+                valor = proy.getNombre();
+            } else if (tipo == 3) {
+                valor = proy.getCiudad();
+            }
+
+            if ((!valor.equalsIgnoreCase("") && valor.toLowerCase().contains(texto)) || (!valor.equalsIgnoreCase("") && texto.equalsIgnoreCase(""))) {
+                proyectosComboBox.add(proy);
+                modelo.addElement(valor);
+            }
+        }
+        comboBox.setModel(modelo);
+        if (modelo.getSize() > 0)
+            comboBox.setSelectedIndex(0);
+        else
+            vaciarDatosOpcionesProy(cod, nombre, ciudad);
+
+    }
+    public void vaciarDatosOpcionesProy(JLabel cod, JLabel nombre, JLabel ciudad) {
+        cod.setText("Código");
+        nombre.setText("Nombre");
+        ciudad.setText("Ciudad");
+    }
+    public void actualizarDatosOpcionesProy(JComboBox<String> comboBox, JLabel cod, JLabel nombre, JLabel ciudad) {
+        ProyectosEntity proy = proyectosComboBox.get(comboBox.getSelectedIndex());
+        cod.setText(String.format("%30s %-30s", "Código:", proy.getCodigo()));
+        nombre.setText(String.format("%30s %-30s", "Nombre:", proy.getNombre()));
+        ciudad.setText(String.format("%30s %-30s", "Ciudad:", proy.getCiudad()));
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Utilidades Proveedores
-    //       Ventana gestión
+    // Ventana gestión
     public ProveedoresEntity construirProveedorConLosDatos() {
         String codigo = t_provCod.getText();
         String nombre = t_provNombre.getText();
@@ -444,7 +628,7 @@ public class VentanaPrincipal {
         boolean eliminado = BorrarDatos.eliminarProveedor(codigo);
         if (eliminado) {
             proveedores = CargarDatos.proveedores();
-            if (indexPagProv * numProvsPorPagLista > proveedores.size())
+            if ((indexPagProv - 1) * numProvsPorPagLista >= proveedores.size())
                 indexPagProv--;
             cargarListaProveedores();
         }
@@ -474,6 +658,7 @@ public class VentanaPrincipal {
                     "Debes rellenar todos los datos obligatorios\nFaltan los siguientes datos:\n" +
                             String.valueOf(datosFaltantes),
                     0);
+
         }
 
         return datosValidos;
@@ -504,8 +689,21 @@ public class VentanaPrincipal {
 
         listaProveedores.setEnabled(true);
     }
+    public void prepararNuevoProveedor() {
+        nuevoProveedor.setEnabled(false);
 
-    //       Ventana búsqueda
+        borrarProveedor.setEnabled(true);
+        editarProveedor.setEnabled(true);
+
+        borrarProveedor.setText("Cancelar");
+        editarProveedor.setText("Insertar");
+
+        listaProveedores.clearSelection();
+        listaProveedores.setEnabled(false);
+        vaciarDatosProveedor();
+    }
+
+    // Ventana búsqueda
     public void actualizarOpcionesProv(JComboBox<String> comboBox, JTextField busqueda, int tipo, JLabel cod, JLabel nombre, JLabel apellidos, JLabel dir) {
         DefaultComboBoxModel<String> modelo = new DefaultComboBoxModel<>();
         proveedoresComboBox = new ArrayList<>();
@@ -549,11 +747,28 @@ public class VentanaPrincipal {
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Cargar Ventanas
+    // INICIO
+    public void cargarVentanaInicio() {
+        try {
+            panelDatos.removeAll();
+            panelDatos.repaint();
+        } catch (Exception ignored) { }
+
+        panelDatos.setLayout(null);
+        confPanel(panelDatos);
+
+        JLabel foto = new JLabel();
+        panelDatos.add(foto);
+        foto.setBounds(0, 0, dimPanelDatos.width, dimPanelDatos.height);
+
+
+    }
+
     // PIEZA
     public void cargarVentanaPiezaGestion() {
         System.out.println("  Cargando datos");
         piezas = CargarDatos.piezas();
-        System.out.println("  Datos cargados (num datos: " + piezas.size() + ")");
+        System.out.println("  Datos cargados: " + piezas.size());
         System.out.println("  Cargando ventana");
         try {
             panelDatos.removeAll();
@@ -668,18 +883,7 @@ public class VentanaPrincipal {
         nuevaPieza.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                nuevaPieza.setEnabled(false);
-
-                borrarPieza.setEnabled(true);
-                editarPieza.setEnabled(true);
-
-                borrarPieza.setText("Cancelar");
-                editarPieza.setText("Insertar");
-
-                listaPiezas.clearSelection();
-                listaPiezas.setEnabled(false);
-                vaciarDatosPieza();
-
+                prepararNuevaPieza();
             }
         });
         borrarPieza.addActionListener(new ActionListener() {
@@ -692,7 +896,7 @@ public class VentanaPrincipal {
                     } catch (NullPointerException ignored) { }
 
                     if (pza != null) {
-                        mostrarJOptionPaneEliminar(1, pza.getCodigo());
+                        mostrarJOptionPaneEliminar(2, pza.getCodigo());
                     }
 
                 } else {
@@ -720,9 +924,12 @@ public class VentanaPrincipal {
                             indexPagPza++;
                         else
                             indexPagPza = numPagsPza;
+                        if (indexPagPza == 0)
+                            indexPagPza = 1;
                         reanudarVentanaPiezas();
                         cargarListaPiezas();
                         listaPiezas.setSelectedIndex(listaPiezas.getLastVisibleIndex());
+                        borrarPieza.setEnabled(true);
                     }
                 }
             }
@@ -775,7 +982,7 @@ public class VentanaPrincipal {
     public void cargarVentanaPiezaBuscar(int tipo) { // 1 -> codigo, 2 -> nombre, 3 -> direccion
         System.out.println("  Cargando datos");
         piezas = CargarDatos.piezas();
-        System.out.println("  Datos cargados (num datos: " + piezas.size() + ")");
+        System.out.println("  Datos cargados: " + piezas.size());
         System.out.println("  Cargando ventana");
         try {
             panelDatos.removeAll();
@@ -877,12 +1084,287 @@ public class VentanaPrincipal {
         actualizarOpcionesPza(comboBox, t_pzaBusqueda, tipo, l_codPza, l_nombre, l_precio, l_desc);
         System.out.println("  Ventana cargada\n");
     }
-    
-    
+
+    // PROYECTO
+    public void cargarVentanaProyectoGestion() {
+        System.out.println("  Cargando datos");
+        proyectos = CargarDatos.proyectos();
+        System.out.println("  Datos cargados: " + proyectos.size());
+        System.out.println("  Cargando ventana");
+        try {
+            panelDatos.removeAll();
+            panelDatos.repaint();
+        } catch (Exception ignored) { }
+
+        panelDatos.setLayout(null);
+        confPanel(panelDatos);
+
+        // LABELS
+        JLabel l_nomListProy = new JLabel("Lista de proyectos", SwingConstants.LEFT);
+        confLabel(l_nomListProy);
+        panelDatos.add(l_nomListProy);
+        l_nomListProy.setBounds(25, 20, dimLabel.width, dimLabel.height);
+        l_nomListProy.setFont(new Font("SegoeUI", Font.BOLD, 12));
+
+        JLabel l_codProy = new JLabel("Código", SwingConstants.RIGHT);
+        confLabel(l_codProy);
+        panelDatos.add(l_codProy);
+        l_codProy.setBounds(180, 80, dimLabel.width, dimLabel.height);
+
+        JLabel l_nombre = new JLabel("Nombre", SwingConstants.RIGHT);
+        confLabel(l_nombre);
+        panelDatos.add(l_nombre);
+        l_nombre.setBounds(180, 140, dimLabel.width, dimLabel.height);
+
+        JLabel l_apellidos = new JLabel("Ciudad", SwingConstants.RIGHT);
+        confLabel(l_apellidos);
+        panelDatos.add(l_apellidos);
+        l_apellidos.setBounds(180, 200, dimLabel.width, dimLabel.height);
+
+        // TEXTFIELDS
+        t_proyCod = new JTextField();
+        confTextFieldCodigo(t_proyCod);
+        panelDatos.add(t_proyCod);
+        t_proyCod.setBounds(395, 78, dimTextFieldCodigo.width, dimTextFieldCodigo.height);
+        t_proyCod.setEditable(false);
+
+        t_proyNombre = new JTextField();
+        confTextField(t_proyNombre);
+        panelDatos.add(t_proyNombre);
+        t_proyNombre.setBounds(395, 138, dimTextField.width, dimTextField.height);
+
+        t_proyCiudad = new JTextField();
+        confTextField(t_proyCiudad);
+        panelDatos.add(t_proyCiudad);
+        t_proyCiudad.setBounds(395, 198, dimTextField.width, dimTextField.height);
+
+        // SCROLLPANE + LIST
+        JScrollPane scrollPane = new JScrollPane();
+        scrollPane.setLayout(null);
+
+        panelDatos.add(scrollPane);
+        scrollPane.setBounds(20, 40, dimScrollPane.width, dimScrollPane.height);
+        confScrollPane(scrollPane);
+
+        listaProyectos = new JList();
+
+        scrollPane.add(listaProyectos);
+        listaProyectos.setBounds(2, 2, dimLista.width, dimLista.height);
+        //listaProyectos.setFont(new Font("Unispace", Font.BOLD, 12));
+        confLista(listaProyectos);
+
+
+        // BOTONES
+        nuevoProyecto = new JButton("Nuevo");
+        confBoton(nuevoProyecto, dimBoton);
+        panelDatos.add(nuevoProyecto);
+        nuevoProyecto.setBounds(20, 430, dimBoton.width, dimBoton.height);
+
+        borrarProyecto = new JButton("Eliminar");
+        confBoton(borrarProyecto, dimBoton);
+        panelDatos.add(borrarProyecto);
+        borrarProyecto.setBounds(360, 430, dimBoton.width, dimBoton.height);
+
+        editarProyecto = new JButton("Editar");
+        confBoton(editarProyecto, dimBoton);
+        panelDatos.add(editarProyecto);
+        editarProyecto.setBounds(520, 430, dimBoton.width, dimBoton.height);
+
+        JButton nextProyecto = new JButton(">");
+        confBoton(nextProyecto, dimBotonPeque);
+        panelDatos.add(nextProyecto);
+        nextProyecto.setBounds(225, 355, dimBotonPeque.width, dimBotonPeque.height);
+
+        JButton prevProyecto = new JButton("<");
+        confBoton(prevProyecto, dimBotonPeque);
+        panelDatos.add(prevProyecto);
+        prevProyecto.setBounds(20, 355, dimBotonPeque.width, dimBotonPeque.height);
+
+        l_paginasProy = new JLabel("", SwingConstants.CENTER);
+        panelDatos.add(l_paginasProy);
+        l_paginasProy.setBounds(75, 370, 135, dimLabel.height);
+        l_paginasProy.setFont(new Font("SegoeUI", Font.BOLD, 12));
+
+        cargarListaProyectos();
+
+        // LISTENERS
+        nuevoProyecto.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                prepararNuevoProyecto();
+            }
+        });
+        borrarProyecto.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (borrarProyecto.getText().equalsIgnoreCase("Eliminar")) {
+                    ProyectosEntity proy = null;
+                    try {
+                        proy = (ProyectosEntity) listaProyectos.getSelectedValue();
+                    } catch (NullPointerException ignored) { }
+
+                    if (proy != null) {
+                        mostrarJOptionPaneEliminar(3, proy.getCodigo());
+                    }
+
+                } else {
+                    reanudarVentanaProyectos();
+                    listaProyectos.setSelectedIndex(0);
+                }
+            }
+        });
+        editarProyecto.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                boolean datosCorrectos = comprobarDatosProyecto();
+                if (datosCorrectos) {
+                    if (editarProyecto.getText().equalsIgnoreCase("Editar")) {
+                        int indexElegido = listaProyectos.getSelectedIndex();
+                        InsertarEditarDatos.saveUpdateProyecto(construirProyectoConLosDatos(), 2);
+                        editarProyectoLista();
+                        reanudarVentanaProyectos();
+                        cargarListaProyectos();
+                        listaProyectos.setSelectedIndex(indexElegido);
+                    } else {
+                        InsertarEditarDatos.saveUpdateProyecto(construirProyectoConLosDatos(), 1);
+                        addProyectoALista();
+                        if (indexPagProy == numPagsProy && listaProyectos.getLastVisibleIndex() == numProysPorPagLista - 1)
+                            indexPagProy++;
+                        else
+                            indexPagProy = numPagsProy;
+                        if (indexPagProy == 0)
+                            indexPagProy = 1;
+                        reanudarVentanaProyectos();
+                        cargarListaProyectos();
+                        listaProyectos.setSelectedIndex(listaProyectos.getLastVisibleIndex());
+                        borrarProyecto.setEnabled(true);
+                    }
+                }
+            }
+        });
+        listaProyectos.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                cargarDatosProyecto();
+            }
+        });
+        nextProyecto.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int indexAntes = indexPagProy;
+                indexPagProy++;
+                if (indexPagProy > numPagsProy)
+                    indexPagProy = 1;
+
+                if (indexAntes != indexPagProy) {
+                    cargarListaProyectos();
+                    listaProyectos.setSelectedIndex(0);
+                }
+            }
+        });
+        prevProyecto.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int indexAntes = indexPagProy;
+                indexPagProy--;
+                if (indexPagProy < 1) {
+                    indexPagProy = proyectos.size() / numProysPorPagLista;
+                    if (indexPagProy * numProysPorPagLista < proyectos.size())
+                        indexPagProy++;
+                }
+
+                if (indexPagProy == 0)
+                    indexPagProy = 1;
+
+                if (indexAntes != indexPagProy) {
+                    cargarListaProyectos();
+                    listaProyectos.setSelectedIndex(0);
+                }
+            }
+        });
+
+        listaProyectos.setSelectedIndex(0);
+        cargarDatosProyecto();
+        System.out.println("  Ventana cargada\n");
+    }
+    public void cargarVentanaProyectoBuscar(int tipo) { // 1 -> codigo, 2 -> nombre, 3 -> direccion
+        System.out.println("  Cargando datos");
+        proyectos = CargarDatos.proyectos();
+        System.out.println("  Datos cargados: " + proyectos.size());
+        System.out.println("  Cargando ventana");
+        try {
+            panelDatos.removeAll();
+            panelDatos.repaint();
+        } catch (Exception ignored) { }
+
+        panelDatos.setLayout(null);
+        confPanel(panelDatos);
+
+        String texto = "Búsqueda";
+        if (tipo == 1)
+            texto = "Introduce el código o parte del código para buscar";
+        else if (tipo == 2)
+            texto = "Introduce el nombre o parte del nombre para buscar";
+        else if (tipo == 3)
+            texto = "Introduce la dirección o parte de la dirección para buscar";
+
+        JLabel l_textoBuscar = new JLabel(texto, SwingConstants.CENTER);
+        panelDatos.add(l_textoBuscar);
+        l_textoBuscar.setBounds(0, 50, dimPanelDatos.width, dimLabel.height);
+        l_textoBuscar.setFont(new Font("SegoeUI", Font.BOLD, 12));
+
+        JTextField t_proyBusqueda = new JTextField();
+        confTextField(t_proyBusqueda);
+        panelDatos.add(t_proyBusqueda);
+        t_proyBusqueda.setBounds(((dimPanelDatos.width / 2) - (dimTextField.width / 2)), 74, dimTextField.width, dimTextField.height);
+
+        JLabel l_opcionesComboBox = new JLabel("Valores encontrados", SwingConstants.CENTER);
+        panelDatos.add(l_opcionesComboBox);
+        l_opcionesComboBox.setBounds(0, 130, dimPanelDatos.width, dimLabel.height);
+        l_opcionesComboBox.setFont(new Font("SegoeUI", Font.BOLD, 12));
+
+        JComboBox<String> comboBox = new JComboBox<String>();
+        panelDatos.add(comboBox);
+        comboBox.setBounds(((dimPanelDatos.width / 2) - (dimTextField.width / 2)), 150, dimTextField.width, dimTextField.height);
+
+        JLabel l_codProy = new JLabel("Código", SwingConstants.CENTER);
+        panelDatos.add(l_codProy);
+        l_codProy.setBounds(0, 240, dimPanelDatos.width, dimLabel.height);
+
+        JLabel l_nombre = new JLabel("Nombre", SwingConstants.CENTER);
+        panelDatos.add(l_nombre);
+        l_nombre.setBounds(0, 290, dimPanelDatos.width, dimLabel.height);
+
+        JLabel l_ciudad = new JLabel("Apellidos", SwingConstants.CENTER);
+        panelDatos.add(l_ciudad);
+        l_ciudad.setBounds(0, 340, dimPanelDatos.width, dimLabel.height);
+
+        comboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                actualizarDatosOpcionesProy(comboBox, l_codProy, l_nombre, l_ciudad);
+            }
+        });
+        t_proyBusqueda.getDocument().addDocumentListener(new DocumentListener() {
+            public void changedUpdate(DocumentEvent e) {
+                actualizarOpcionesProy(comboBox, t_proyBusqueda, tipo, l_codProy, l_nombre, l_ciudad);
+            }
+            public void removeUpdate(DocumentEvent e) {
+                actualizarOpcionesProy(comboBox, t_proyBusqueda, tipo, l_codProy, l_nombre, l_ciudad);
+            }
+            public void insertUpdate(DocumentEvent e) {
+                actualizarOpcionesProy(comboBox, t_proyBusqueda, tipo, l_codProy, l_nombre, l_ciudad);
+            }
+        });
+        actualizarOpcionesProy(comboBox, t_proyBusqueda, tipo, l_codProy, l_nombre, l_ciudad);
+        System.out.println("  Ventana cargada\n");
+    }
+
+    // PROVEEDOR
     public void cargarVentanaProveedorGestion() {
         System.out.println("  Cargando datos");
         proveedores = CargarDatos.proveedores();
-        System.out.println("  Datos cargados (num datos: " + proveedores.size() + ")");
+        System.out.println("  Datos cargados: " + proveedores.size());
         System.out.println("  Cargando ventana");
         try {
             panelDatos.removeAll();
@@ -994,18 +1476,7 @@ public class VentanaPrincipal {
         nuevoProveedor.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                nuevoProveedor.setEnabled(false);
-
-                borrarProveedor.setEnabled(true);
-                editarProveedor.setEnabled(true);
-
-                borrarProveedor.setText("Cancelar");
-                editarProveedor.setText("Insertar");
-
-                listaProveedores.clearSelection();
-                listaProveedores.setEnabled(false);
-                vaciarDatosProveedor();
-
+                prepararNuevoProveedor();
             }
         });
         borrarProveedor.addActionListener(new ActionListener() {
@@ -1046,9 +1517,12 @@ public class VentanaPrincipal {
                             indexPagProv++;
                         else
                             indexPagProv = numPagsProv;
+                        if (indexPagProv == 0)
+                            indexPagProv = 1;
                         reanudarVentanaProveedores();
                         cargarListaProveedores();
                         listaProveedores.setSelectedIndex(listaProveedores.getLastVisibleIndex());
+                        borrarProveedor.setEnabled(true);
                     }
                 }
             }
@@ -1101,7 +1575,7 @@ public class VentanaPrincipal {
     public void cargarVentanaProveedorBuscar(int tipo) { // 1 -> codigo, 2 -> nombre, 3 -> direccion
         System.out.println("  Cargando datos");
         proveedores = CargarDatos.proveedores();
-        System.out.println("  Datos cargados (num datos: " + proveedores.size() + ")");
+        System.out.println("  Datos cargados: " + proveedores.size());
         System.out.println("  Cargando ventana");
         try {
             panelDatos.removeAll();
@@ -1175,7 +1649,7 @@ public class VentanaPrincipal {
         System.out.println("  Ventana cargada\n");
     }
 
-
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Configurar Menú
     public void menuProyectos(JMenuBar menuBar) {
         JMenu menu, subMenu;
@@ -1191,8 +1665,8 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //TODO LISTENER GESTIÓN PROYECTOS
                 System.out.println("Proyectos: Gestión");
+                cargarVentanaProyectoGestion();
             }
         });
 
@@ -1204,28 +1678,26 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //TODO LISTENER PROYECTOS BÚSQUEDA POR CÓDIGO
                 System.out.println("Proyectos: Búsqueda por Código");
+                cargarVentanaProyectoBuscar(1);
             }
         });
-
         menuItem = new JMenuItem("Por Nombre");
         subMenu.add(menuItem);
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //TODO LISTENER PROYECTOS BÚSQUEDA POR NOMBRE
                 System.out.println("Proyectos: Búsqueda por Nombre");
+                cargarVentanaProyectoBuscar(2);
             }
         });
-
         menuItem = new JMenuItem("Por Ciudad");
         subMenu.add(menuItem);
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //TODO LISTENER PROYECTOS BÚSQUEDA POR CIUDAD
                 System.out.println("Proyectos: Búsqueda por Ciudad");
+                cargarVentanaProyectoBuscar(3);
             }
         });
 
@@ -1246,7 +1718,6 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //TODO LISTENER GESTIÓN PIEZAS
                 System.out.println("Piezas: Gestión");
                 cargarVentanaPiezaGestion();
             }
@@ -1260,7 +1731,6 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //TODO LISTENER PIEZAS BÚSQUEDA POR CÓDIGO
                 System.out.println("Piezas: Búsqueda por Código");
                 cargarVentanaPiezaBuscar(1);
             }
@@ -1271,7 +1741,6 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //TODO LISTENER PIEZAS BÚSQUEDA POR NOMBRE
                 System.out.println("Piezas: Búsqueda por Nombre");
                 cargarVentanaPiezaBuscar(2);
             }
@@ -1391,6 +1860,7 @@ public class VentanaPrincipal {
         ventanaPrincipal.setJMenuBar(menuBar);
     }
 
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Getters y Setters
     public JPanel getPanel() {
         return panel;
@@ -1399,6 +1869,7 @@ public class VentanaPrincipal {
         this.ventanaPrincipal = ventanaPrincipal;
     }
 
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Lanzador ventana
     public static void main(String[] args) {
         JFrame frame = new JFrame("Ventana Principal");

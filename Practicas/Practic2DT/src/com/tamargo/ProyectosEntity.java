@@ -17,6 +17,11 @@ public class ProyectosEntity {
         this.ciudad = proy.getCiudad();
     }
 
+    @Override
+    public String toString() {
+        return String.format("%6s | %s", codigo, nombre);
+    }
+
     @Id
     @Column(name = "codigo", nullable = false, length = 6)
     public String getCodigo() {
