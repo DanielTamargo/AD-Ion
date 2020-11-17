@@ -12,6 +12,13 @@ public class GestionEntity {
     private PiezasEntity piezasByCodPieza;
     private ProyectosEntity proyectosByCodProyecto;
 
+    public void actualizarDatos(GestionEntity gestion) {
+        this.cantidad = gestion.getCantidad();
+        this.proveedoresByCodProveedor = gestion.getProveedoresByCodProveedor();
+        this.piezasByCodPieza = gestion.getPiezasByCodPieza();
+        this.proyectosByCodProyecto = gestion.getProyectosByCodProyecto();
+    }
+
     @Id
     @Column(name = "codigo", nullable = false)
     public int getCodigo() {

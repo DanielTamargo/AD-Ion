@@ -1,5 +1,6 @@
 package com.tamargo.util;
 
+import com.tamargo.GestionEntity;
 import com.tamargo.PiezasEntity;
 import com.tamargo.ProveedoresEntity;
 import com.tamargo.ProyectosEntity;
@@ -30,6 +31,81 @@ public class InsertarEditarDatos {
         JDialog dialog = pane.createDialog(titulo);
         okButton.addActionListener(e -> dialog.dispose());
         dialog.setVisible(true);
+    }
+
+    // tipoAccion == 1 -> save, == 2 -> update
+    public static boolean saveUpdateGestion(ProveedoresEntity prov, PiezasEntity pieza, ProyectosEntity proy, double cantidad, int tipoAccion) {
+        boolean accionCompletada = true;
+
+        String titulo = "Error";
+
+        if (sessionFactory != null) {
+            Session session = null;
+            try {
+                session = sessionFactory.openSession();
+            } catch (HibernateException ignored) { }
+
+            if (session != null) {
+                try {
+                    Transaction tx = session.beginTransaction();
+
+                    if (tipoAccion == 1) {
+                        GestionEntity gestion = new GestionEntity();
+                        gestion.setCantidad(cantidad);
+                        gestion.setPiezasByCodPieza(pieza);
+                        gestion.setProveedoresByCodProveedor(prov);
+                        gestion.setProyectosByCodProyecto(proy);
+
+                        session.save(gestion);
+                        tx.commit();
+                        mostrarJOptionPane("Proveedor Insertado",
+                                "Proveedor insertado con éxito.",
+                                1);
+                    } else if (tipoAccion == 2) {
+                        String hql = "from GestionEntity g " +
+                                " where g.proveedoresByCodProveedor.codigo='" + prov.getCodigo() + "' " +
+                                " and g.piezasByCodPieza.codigo='" + pieza.getCodigo() + "' " +
+                                " and g.proyectosByCodProyecto.codigo='" + proy.getCodigo() + "'";
+                        Query q = session.createQuery(hql).setMaxResults(1);
+                        GestionEntity gest = (GestionEntity) q.uniqueResult();
+                        gest.actualizarDatos(gest);
+                        session.update(prov);
+                        tx.commit();
+                        mostrarJOptionPane("Gestion Editada",
+                                "Gestion editada con éxito.",
+                                1);
+                    }
+                } catch (IllegalArgumentException ex) {
+                    String mensaje = "Error al insertar/editar. No existe la gestión en cuestión";
+                    mostrarJOptionPane(titulo, mensaje, 0);
+                    System.out.println("Error al insertar/editar. No existe la gestión en cuestión");
+                    accionCompletada = false;
+                } catch (ConstraintViolationException ex) {
+                    String mensaje = "Error al insertar/editar. Se está incumpliendo la constraint:\n" + ex.getLocalizedMessage();
+                    mostrarJOptionPane(titulo, mensaje, 0);
+                    System.out.println("Error al insertar/editar. Se está incumpliendo la constraint:\n" + ex.getLocalizedMessage());
+                    accionCompletada = false;
+                } catch (TransientPropertyValueException ex) {
+                    String mensaje = "Error al insertar/editar. No se puede insertar/editar una gestión\nque no existe o está cargada correctamente";
+                    mostrarJOptionPane(titulo, mensaje, 0);
+                    System.out.println("Error al insertar/editar. No se puede insertar/editar una gestión\nque no existe o está cargada correctamente");
+                    accionCompletada = false;
+                }
+                session.close();
+            } else {
+                String mensaje = "No se pudo abrir una sesión. Imposible insertar/actualizar la gestión.";
+                mostrarJOptionPane(titulo, mensaje, 0);
+                System.out.println("No se pudo abrir una sesión. Imposible insertar/actualizar la gestión.");
+                accionCompletada = false;
+            }
+        } else {
+            String mensaje = "SessionFactory no existente. Imposible insertar/actualizar la gestión.";
+            mostrarJOptionPane(titulo, mensaje, 0);
+            System.out.println("SessionFactory no existente. Imposible insertar/actualizar la gestión.");
+            accionCompletada = false;
+        }
+
+        return accionCompletada;
     }
 
     // tipoAccion == 1 -> save, == 2 -> update
@@ -78,7 +154,7 @@ public class InsertarEditarDatos {
                 } catch (TransientPropertyValueException ex) {
                     String mensaje = "Error al insertar/editar. No se puede insertar/editar un proveedor\nque no existe o está cargado correctamente";
                     mostrarJOptionPane(titulo, mensaje, 0);
-                    System.out.println("Error al insertar/editar. No se puede insertar/editar un proveedor\nque no existe o está cargaddo correctamente");
+                    System.out.println("Error al insertar/editar. No se puede insertar/editar un proveedor\nque no existe o está cargado correctamente");
                     accionCompletada = false;
                 }
                 session.close();
@@ -142,9 +218,9 @@ public class InsertarEditarDatos {
                     System.out.println("Error al insertar/editar. Se está incumpliendo la constraint:\n" + ex.getLocalizedMessage());
                     accionCompletada = false;
                 } catch (TransientPropertyValueException ex) {
-                    String mensaje = "Error al insertar/editar. No se puede insertar/editar un pieza\nque no existe o está cargado correctamente";
+                    String mensaje = "Error al insertar/editar. No se puede insertar/editar una pieza\nque no existe o está cargada correctamente";
                     mostrarJOptionPane(titulo, mensaje, 0);
-                    System.out.println("Error al insertar/editar. No se puede insertar/editar un pieza\nque no existe o está cargaddo correctamente");
+                    System.out.println("Error al insertar/editar. No se puede insertar/editar una pieza\nque no existe o está cargada correctamente");
                     accionCompletada = false;
                 }
                 session.close();
@@ -210,7 +286,7 @@ public class InsertarEditarDatos {
                 } catch (TransientPropertyValueException ex) {
                     String mensaje = "Error al insertar/editar. No se puede insertar/editar un proyecto\nque no existe o está cargado correctamente";
                     mostrarJOptionPane(titulo, mensaje, 0);
-                    System.out.println("Error al insertar/editar. No se puede insertar/editar un proyecto\nque no existe o está cargaddo correctamente");
+                    System.out.println("Error al insertar/editar. No se puede insertar/editar un proyecto\nque no existe o está cargado correctamente");
                     accionCompletada = false;
                 }
                 session.close();

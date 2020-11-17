@@ -1,6 +1,5 @@
 package com.tamargo.ventanas;
 
-import com.sun.istack.Nullable;
 import com.tamargo.GestionEntity;
 import com.tamargo.PiezasEntity;
 import com.tamargo.ProveedoresEntity;
@@ -22,8 +21,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
 
 public class VentanaPrincipal {
     // Base de la Ventana
@@ -399,11 +396,16 @@ public class VentanaPrincipal {
 
         try {
             double prueba = Double.parseDouble(t_pzaPrecio.getText().replace(',','.'));
+            if (prueba < 0) {
+                mostrarJOptionPane("Faltan Datos",
+                        "El precio no puede ser negativo",
+                        0);
+                return false;
+            }
         } catch (NumberFormatException ignored) {
             mostrarJOptionPane("Faltan Datos",
                     "Debes introducir un precio con el siguiente formato:" +
-                            "entero.decimal (Ejemplo: 7.5)" +
-                            String.valueOf(datosFaltantes),
+                            "entero.decimal (Ejemplo: 7.5)",
                     0);
             return false;
         }
@@ -611,15 +613,15 @@ public class VentanaPrincipal {
 
     }
     public void vaciarDatosOpcionesProy(JLabel cod, JLabel nombre, JLabel ciudad) {
-        cod.setText("Código");
-        nombre.setText("Nombre");
-        ciudad.setText("Ciudad");
+        cod.setText("");
+        nombre.setText("");
+        ciudad.setText("");
     }
     public void actualizarDatosOpcionesProy(JComboBox<String> comboBox, JLabel cod, JLabel nombre, JLabel ciudad) {
         ProyectosEntity proy = proyectosComboBox.get(comboBox.getSelectedIndex());
-        cod.setText(String.format("%30s %-30s", "Código:", proy.getCodigo()));
-        nombre.setText(String.format("%30s %-30s", "Nombre:", proy.getNombre()));
-        ciudad.setText(String.format("%30s %-30s", "Ciudad:", proy.getCiudad()));
+        cod.setText(proy.getCodigo());
+        nombre.setText(proy.getNombre());
+        ciudad.setText(proy.getCiudad());
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -754,17 +756,17 @@ public class VentanaPrincipal {
 
     }
     public void vaciarDatosOpcionesProv(JLabel cod, JLabel nombre, JLabel apellidos, JLabel dir) {
-        cod.setText("Código");
-        nombre.setText("Nombre");
-        apellidos.setText("Apellidos");
-        dir.setText("Dirección");
+        cod.setText("");
+        nombre.setText("");
+        apellidos.setText("");
+        dir.setText("");
     }
     public void actualizarDatosOpcionesProv(JComboBox<String> comboBox, JLabel cod, JLabel nombre, JLabel apellidos, JLabel dir) {
         ProveedoresEntity prov = proveedoresComboBox.get(comboBox.getSelectedIndex());
-        cod.setText(String.format("%30s %-30s", "Código:", prov.getCodigo()));
-        nombre.setText(String.format("%30s %-30s", "Nombre:", prov.getNombre()));
-        apellidos.setText(String.format("%30s %-30s", "Apellidos:", prov.getApellidos()));
-        dir.setText(String.format("%30s %-30s", "Dirección:", prov.getDireccion()));
+        cod.setText(prov.getCodigo());
+        nombre.setText(prov.getNombre());
+        apellidos.setText(prov.getApellidos());
+        dir.setText(prov.getDireccion());
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -939,6 +941,7 @@ public class VentanaPrincipal {
                 listarGestiones.setEnabled(false);
 
                 gestionPrepararNuevaGestion();
+
             }
         });
         editarGestion.addActionListener(new ActionListener() {
@@ -946,8 +949,8 @@ public class VentanaPrincipal {
             public void actionPerformed(ActionEvent e) {
                 if (editarGestion.getText().equalsIgnoreCase("Insertar")) {
                     // TODO INSERTAR NUEVA GESTIÓN
-
-                    reanudarVentanaAdminGestion();
+                    if (gestionInsertarNuevaGestion())
+                        reanudarVentanaAdminGestion();
                 } else {
                     // TODO EDITAR LA CANTIDAD DE LA GESTIÓN SELECCIONADA
                 }
@@ -1051,9 +1054,10 @@ public class VentanaPrincipal {
                             }
                         }
                         cb_gestProyecto.setModel(modelo);
-                        if (modelo.getSize() > 0)
+                        if (modelo.getSize() > 0) {
                             cb_gestProyecto.setSelectedIndex(0);
-                        else {
+                            t_gesCantidad.setText("1");
+                        } else {
                             t_gesNomProyecto.setText("");
                             t_gesCiudadProyecto.setText("");
                         }
@@ -1079,6 +1083,56 @@ public class VentanaPrincipal {
 
         recargarDatosVentanaAdminGestion();
         System.out.println("  Ventana cargada\n");
+    }
+    public boolean gestionInsertarNuevaGestion() {
+        boolean insertado = false;
+        if (gestionComprobarCantidadCorrecta()) {
+            ProveedoresEntity prov = null;
+            PiezasEntity pieza = null;
+            ProyectosEntity proyecto = null;
+            double cantidad = -1;
+
+            try {
+                prov = proveedoresNuevaGestion.get(cb_gestProveedor.getSelectedIndex());
+                pieza = piezasNuevaGestion.get(cb_gestPieza.getSelectedIndex());
+                proyecto = proyectosNuevaGestion.get(cb_gestProyecto.getSelectedIndex());
+                cantidad = Double.parseDouble(t_gesCantidad.getText().replace(',','.'));
+            } catch (NullPointerException | IllegalArgumentException ignored) {}
+
+            if (prov != null && pieza != null && proyecto != null) {
+                if (cantidad >= 0) {
+                    insertado = InsertarEditarDatos.saveUpdateGestion(prov, pieza, proyecto, cantidad, 1);
+                }
+            } else {
+                mostrarJOptionPane("Error al insertar", "Ha ocurrido un error al elegir los componentes de la nueva gestión", 0);
+            }
+
+        }
+        return insertado;
+    }
+    public void gestionEditarGestion() {
+
+    }
+    public boolean gestionComprobarCantidadCorrecta() {
+        if (t_gesCantidad.getText().equalsIgnoreCase("")) {
+            mostrarJOptionPane("Faltan datos",
+                    "Debes introducir la cantidad", 0);
+            return false;
+        }
+
+        try {
+            double cantidad = Double.parseDouble(t_gesCantidad.getText().replace(',','.'));
+            if (cantidad < 0) {
+                mostrarJOptionPane("Faltan datos",
+                        "La cantidad no puede ser negativa", 0);
+                return false;
+            }
+            return true;
+        } catch (IllegalArgumentException | NullPointerException ignored) {
+            mostrarJOptionPane("Faltan datos",
+                    "La cantidad debe introducirse en el siguiente formato:\nentero.decimal (ejemplo: 2.5)", 0);
+            return false;
+        }
     }
     public void gestionPrepararNuevaGestion() {
         ArrayList<ProveedoresEntity> proveedores = CargarDatos.proveedores();
@@ -1117,7 +1171,7 @@ public class VentanaPrincipal {
 
                 String titulo = "Sin posibilidades";
                 String mensaje = "Parece que ya has cubierto todas las posibilidades.\n" +
-                        "Tendrás que crear nuevos proveedores, piezas o proyectos para poder crear nuevs gestiones.";
+                        "Tendrás que crear nuevos proveedores, piezas o proyectos para poder crear nuevas gestiones.";
 
 
                 final JOptionPane pane = new JOptionPane(mensaje,
@@ -1225,6 +1279,9 @@ public class VentanaPrincipal {
         try {
             gestionCargarCantidad();
         } catch (NullPointerException ignored) {}
+
+        gestionCargarProveedorPiezas();
+        gestionCargarDatosPieza();
     }
     public void gestionCargarDatosPieza() {
         PiezasEntity pieza = null;
@@ -1237,6 +1294,9 @@ public class VentanaPrincipal {
         try {
             gestionCargarCantidad();
         } catch (NullPointerException ignored) {}
+
+        gestionCargarProveedorPiezasProyecto();
+        gestionCargarDatosProyecto();
     }
     public void gestionCargarDatosProyecto() {
         ProyectosEntity proyecto = null;
@@ -1259,7 +1319,7 @@ public class VentanaPrincipal {
             t_gesCantidad.setText(String.format("%.2f", cantidad));
         }
         else
-            t_gesCantidad.setText("");
+            t_gesCantidad.setText("1");
     }
     public void reanudarVentanaAdminGestion() {
         insertando = false;
@@ -1289,15 +1349,19 @@ public class VentanaPrincipal {
         }
     }
     public void gestionCargarProveedorPiezas() {
-        gestPiezas = CargarDatos.piezasGestionProv(gestProveedores.get(cb_gestProveedor.getSelectedIndex()).getCodigo());
-        prepararComboBoxGestPiezas(gestPiezas);
+        if (!insertando) {
+            gestPiezas = CargarDatos.piezasGestionProv(gestProveedores.get(cb_gestProveedor.getSelectedIndex()).getCodigo());
+            prepararComboBoxGestPiezas(gestPiezas);
+        }
     }
     public void gestionCargarProveedorPiezasProyecto() {
-        gestProyectos = CargarDatos.proyectosGestionProvPieza(
-                gestProveedores.get(cb_gestProveedor.getSelectedIndex()).getCodigo(),
-                gestPiezas.get(cb_gestPieza.getSelectedIndex()).getCodigo()
-        );
-        prepararComboBoxGestProyectos(gestProyectos);
+        if (!insertando) {
+            gestProyectos = CargarDatos.proyectosGestionProvPieza(
+                    gestProveedores.get(cb_gestProveedor.getSelectedIndex()).getCodigo(),
+                    gestPiezas.get(cb_gestPieza.getSelectedIndex()).getCodigo()
+            );
+            prepararComboBoxGestProyectos(gestProyectos);
+        }
     }
     public void prepararComboBoxGestProveedores(ArrayList<ProveedoresEntity> proveedores) {
         DefaultComboBoxModel<String> modelo = new DefaultComboBoxModel<>();
@@ -1574,7 +1638,14 @@ public class VentanaPrincipal {
 
         JComboBox<String> comboBox = new JComboBox<String>();
         panelDatos.add(comboBox);
-        comboBox.setBounds(((dimPanelDatos.width / 2) - (dimTextField.width / 2)), 150, dimTextField.width, dimTextField.height);
+        int anchuraComboBox;
+        if (tipo == 1)
+            anchuraComboBox = 90;
+        else if (tipo == 2)
+            anchuraComboBox = 150;
+        else
+            anchuraComboBox = 200;
+        comboBox.setBounds(((dimPanelDatos.width / 2) - (anchuraComboBox / 2)), 150, anchuraComboBox, dimTextField.height);
 
         JLabel l_codPzaHeader = new JLabel("Código", SwingConstants.CENTER);
         panelDatos.add(l_codPzaHeader);
@@ -1603,7 +1674,7 @@ public class VentanaPrincipal {
         panelDatos.add(l_precio);
         l_precio.setBounds(0, 340, dimPanelDatos.width, dimLabel.height);
 
-        JLabel l_descPzaHeader = new JLabel("Código", SwingConstants.CENTER);
+        JLabel l_descPzaHeader = new JLabel("Descripción", SwingConstants.CENTER);
         panelDatos.add(l_descPzaHeader);
         l_descPzaHeader.setBounds(0, 372, dimPanelDatos.width, dimLabel.height);
         l_descPzaHeader.setForeground(Color.GRAY);
@@ -1613,6 +1684,7 @@ public class VentanaPrincipal {
         l_desc.setBounds((dimPanelDatos.width / 2) - ((dimTextArea.width + 100) / 2), 390, (dimTextArea.width + 100), dimTextArea.height);
         l_desc.setOpaque(false);
         l_desc.setEditable(false);
+        l_desc.setFont(l_precio.getFont());
         StyledDocument doc = l_desc.getStyledDocument();
         SimpleAttributeSet center = new SimpleAttributeSet();
         StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
@@ -1882,17 +1954,39 @@ public class VentanaPrincipal {
 
         JComboBox<String> comboBox = new JComboBox<String>();
         panelDatos.add(comboBox);
-        comboBox.setBounds(((dimPanelDatos.width / 2) - (dimTextField.width / 2)), 150, dimTextField.width, dimTextField.height);
+        int anchuraComboBox;
+        if (tipo == 1)
+            anchuraComboBox = 90;
+        else if (tipo == 2)
+            anchuraComboBox = 150;
+        else
+            anchuraComboBox = 200;
+        comboBox.setBounds(((dimPanelDatos.width / 2) - (anchuraComboBox / 2)), 150, anchuraComboBox, dimTextField.height);
 
-        JLabel l_codProy = new JLabel("Código", SwingConstants.CENTER);
+        JLabel l_codProyHeader = new JLabel("Código", SwingConstants.CENTER);
+        panelDatos.add(l_codProyHeader);
+        l_codProyHeader.setBounds(0, 222, dimPanelDatos.width, dimLabel.height);
+        l_codProyHeader.setForeground(Color.GRAY);
+        
+        JLabel l_codProy = new JLabel("", SwingConstants.CENTER);
         panelDatos.add(l_codProy);
         l_codProy.setBounds(0, 240, dimPanelDatos.width, dimLabel.height);
 
-        JLabel l_nombre = new JLabel("Nombre", SwingConstants.CENTER);
+        JLabel l_nombreProyHeader = new JLabel("Nombre", SwingConstants.CENTER);
+        panelDatos.add(l_nombreProyHeader);
+        l_nombreProyHeader.setBounds(0, 272, dimPanelDatos.width, dimLabel.height);
+        l_nombreProyHeader.setForeground(Color.GRAY);
+        
+        JLabel l_nombre = new JLabel("", SwingConstants.CENTER);
         panelDatos.add(l_nombre);
         l_nombre.setBounds(0, 290, dimPanelDatos.width, dimLabel.height);
 
-        JLabel l_ciudad = new JLabel("Apellidos", SwingConstants.CENTER);
+        JLabel l_ciudadProyHeader = new JLabel("Ciudad", SwingConstants.CENTER);
+        panelDatos.add(l_ciudadProyHeader);
+        l_ciudadProyHeader.setBounds(0, 322, dimPanelDatos.width, dimLabel.height);
+        l_ciudadProyHeader.setForeground(Color.GRAY);
+        
+        JLabel l_ciudad = new JLabel("", SwingConstants.CENTER);
         panelDatos.add(l_ciudad);
         l_ciudad.setBounds(0, 340, dimPanelDatos.width, dimLabel.height);
 
@@ -2167,21 +2261,48 @@ public class VentanaPrincipal {
 
         JComboBox<String> comboBox = new JComboBox<String>();
         panelDatos.add(comboBox);
-        comboBox.setBounds(((dimPanelDatos.width / 2) - (dimTextField.width / 2)), 150, dimTextField.width, dimTextField.height);
+        int anchuraComboBox;
+        if (tipo == 1)
+            anchuraComboBox = 90;
+        else if (tipo == 2)
+            anchuraComboBox = 150;
+        else
+            anchuraComboBox = 200;
+        comboBox.setBounds(((dimPanelDatos.width / 2) - (anchuraComboBox / 2)), 150, anchuraComboBox, dimTextField.height);
 
-        JLabel l_codProv = new JLabel("Código", SwingConstants.CENTER);
+        JLabel l_codProvHeader = new JLabel("Código", SwingConstants.CENTER);
+        panelDatos.add(l_codProvHeader);
+        l_codProvHeader.setBounds(0, 222, dimPanelDatos.width, dimLabel.height);
+        l_codProvHeader.setForeground(Color.GRAY);
+        
+        JLabel l_codProv = new JLabel("", SwingConstants.CENTER);
         panelDatos.add(l_codProv);
         l_codProv.setBounds(0, 240, dimPanelDatos.width, dimLabel.height);
 
-        JLabel l_nombre = new JLabel("Nombre", SwingConstants.CENTER);
+        JLabel l_nombreProvHeader = new JLabel("Nombre", SwingConstants.CENTER);
+        panelDatos.add(l_nombreProvHeader);
+        l_nombreProvHeader.setBounds(0, 272, dimPanelDatos.width, dimLabel.height);
+        l_nombreProvHeader.setForeground(Color.GRAY);
+        
+        JLabel l_nombre = new JLabel("", SwingConstants.CENTER);
         panelDatos.add(l_nombre);
         l_nombre.setBounds(0, 290, dimPanelDatos.width, dimLabel.height);
 
-        JLabel l_apellidos = new JLabel("Apellidos", SwingConstants.CENTER);
+        JLabel l_apeProvHeader = new JLabel("Apellidos", SwingConstants.CENTER);
+        panelDatos.add(l_apeProvHeader);
+        l_apeProvHeader.setBounds(0, 322, dimPanelDatos.width, dimLabel.height);
+        l_apeProvHeader.setForeground(Color.GRAY);
+
+        JLabel l_apellidos = new JLabel("", SwingConstants.CENTER);
         panelDatos.add(l_apellidos);
         l_apellidos.setBounds(0, 340, dimPanelDatos.width, dimLabel.height);
 
-        JLabel l_direccion = new JLabel("Dirección", SwingConstants.CENTER);
+        JLabel l_dirProvHeader = new JLabel("Dirección", SwingConstants.CENTER);
+        panelDatos.add(l_dirProvHeader);
+        l_dirProvHeader.setBounds(0, 372, dimPanelDatos.width, dimLabel.height);
+        l_dirProvHeader.setForeground(Color.GRAY);
+        
+        JLabel l_direccion = new JLabel("", SwingConstants.CENTER);
         panelDatos.add(l_direccion);
         l_direccion.setBounds(0, 390, dimPanelDatos.width, dimLabel.height);
 
