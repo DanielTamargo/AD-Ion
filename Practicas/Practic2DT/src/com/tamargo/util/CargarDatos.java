@@ -1,5 +1,6 @@
 package com.tamargo.util;
 
+import com.tamargo.GestionEntity;
 import com.tamargo.PiezasEntity;
 import com.tamargo.ProveedoresEntity;
 import com.tamargo.ProyectosEntity;
@@ -80,6 +81,265 @@ public class CargarDatos {
             System.out.println("SessionFactory no existente. Imposible cargar la lista de proveedores.");
         }
         return nuevoCodigo;
+    }
+
+    public static long cargarNumProyectos() {
+        long numProyectos = 0;
+
+        if (sessionFactory != null) {
+            Session session = null;
+            try {
+                session = sessionFactory.openSession();
+            } catch (HibernateException ignored) { }
+
+            if (session != null) {
+                String hql = "select count(*) from ProyectosEntity";
+                Query q = session.createQuery(hql).setFetchSize(1);
+                numProyectos = (long) q.uniqueResult();
+                session.close();
+            } else {
+                System.out.println("No se pudo abrir una sesión. Imposible cargar la cantidad.");
+            }
+        } else {
+            System.out.println("SessionFactory no existente. Imposible cargar la cantidad.");
+        }
+
+        return numProyectos;
+    }
+    
+    public static long cargarNumPiezas() {
+        long numPiezas = 0;
+
+        if (sessionFactory != null) {
+            Session session = null;
+            try {
+                session = sessionFactory.openSession();
+            } catch (HibernateException ignored) { }
+
+            if (session != null) {
+                String hql = "select count(*) from PiezasEntity";
+                Query q = session.createQuery(hql).setFetchSize(1);
+                numPiezas = (long) q.uniqueResult();
+                session.close();
+            } else {
+                System.out.println("No se pudo abrir una sesión. Imposible cargar la cantidad.");
+            }
+        } else {
+            System.out.println("SessionFactory no existente. Imposible cargar la cantidad.");
+        }
+
+        return numPiezas;
+    }
+
+    public static boolean gestionProvPiezProyExiste(String codProv, String codPieza, String codProyecto) {
+        boolean existe = false;
+        if (sessionFactory != null) {
+            Session session = null;
+            try {
+                session = sessionFactory.openSession();
+            } catch (HibernateException ignored) { }
+
+            if (session != null) {
+                String hql = "select count(*) from GestionEntity p " +
+                        " where p.proveedoresByCodProveedor.codigo='" + codProv + "' " +
+                        " and p.piezasByCodPieza.codigo='" + codPieza + "' " +
+                        " and p.proyectosByCodProyecto.codigo='" + codProyecto + "'";
+                Query q = session.createQuery(hql).setFetchSize(1);
+                long num = -1;
+                try {
+                    num = (long) q.uniqueResult();
+                } catch (IllegalArgumentException | NullPointerException ignored) {}
+                if (num > 0)
+                    existe = true;
+                session.close();
+            } else {
+                System.out.println("No se pudo abrir una sesión. Imposible cargar la cantidad.");
+            }
+        } else {
+            System.out.println("SessionFactory no existente. Imposible cargar la cantidad.");
+        }
+
+        return existe;
+    }
+
+    public static long cargarNumProvPiezaProyGestion(String codProv, String codPieza, String codProyecto) {
+        long numProvPiezaProyecto = 0;
+
+        if (sessionFactory != null) {
+            Session session = null;
+            try {
+                session = sessionFactory.openSession();
+            } catch (HibernateException ignored) { }
+
+            if (session != null) {
+                String hql = "select count(*) from GestionEntity p " +
+                        " where p.proveedoresByCodProveedor.codigo='" + codProv + "' " +
+                        " and p.piezasByCodPieza.codigo='" + codPieza + "' " +
+                        " and p.proyectosByCodProyecto.codigo='" + codProyecto + "'";
+                Query q = session.createQuery(hql).setFetchSize(1);
+                numProvPiezaProyecto = (long) q.uniqueResult();
+                session.close();
+            } else {
+                System.out.println("No se pudo abrir una sesión. Imposible cargar la cantidad.");
+            }
+        } else {
+            System.out.println("SessionFactory no existente. Imposible cargar la cantidad.");
+        }
+
+        return numProvPiezaProyecto;
+    }
+
+    public static long cargarNumProvPiezaGestion(String codProv, String codPieza) {
+        long numProvPieza = 0;
+
+        if (sessionFactory != null) {
+            Session session = null;
+            try {
+                session = sessionFactory.openSession();
+            } catch (HibernateException ignored) { }
+
+            if (session != null) {
+                String hql = "select count(*) from GestionEntity p " +
+                        " where p.proveedoresByCodProveedor.codigo='" + codProv + "' " +
+                        " and p.piezasByCodPieza.codigo='" + codPieza + "'";
+                Query q = session.createQuery(hql).setFetchSize(1);
+                numProvPieza = (long) q.uniqueResult();
+                session.close();
+            } else {
+                System.out.println("No se pudo abrir una sesión. Imposible cargar la cantidad.");
+            }
+        } else {
+            System.out.println("SessionFactory no existente. Imposible cargar la cantidad.");
+        }
+
+        return numProvPieza;
+    }
+
+    public static long cargarNumProvGestion(String codProv) {
+        long numProvGestion = 0;
+
+        if (sessionFactory != null) {
+            Session session = null;
+            try {
+                session = sessionFactory.openSession();
+            } catch (HibernateException ignored) { }
+
+            if (session != null) {
+                String hql = "select count(*) from GestionEntity p where p.proveedoresByCodProveedor.codigo='" + codProv + "'";
+                Query q = session.createQuery(hql).setFetchSize(1);
+                numProvGestion = (long) q.uniqueResult();
+                session.close();
+            } else {
+                System.out.println("No se pudo abrir una sesión. Imposible cargar la cantidad.");
+            }
+        } else {
+            System.out.println("SessionFactory no existente. Imposible cargar la cantidad.");
+        }
+
+        return numProvGestion;
+    }
+
+    public static double cantidadGestionProvPiezProyecto(String codProveedor, String codPieza, String codProyecto) {
+        double cantidad = 0f;
+        if (sessionFactory != null) {
+            Session session = null;
+            try {
+                session = sessionFactory.openSession();
+            } catch (HibernateException ignored) { }
+
+            if (session != null) {
+                String hql = "select e.cantidad " +
+                        "from GestionEntity e " +
+                        "where e.proveedoresByCodProveedor.codigo='" + codProveedor + "'" +
+                        " and e.piezasByCodPieza.codigo='" + codPieza + "'";
+                Query q = session.createQuery(hql).setFetchSize(1);
+                cantidad = (double) q.uniqueResult();
+                session.close();
+            } else {
+                System.out.println("No se pudo abrir una sesión. Imposible cargar la cantidad.");
+            }
+        } else {
+            System.out.println("SessionFactory no existente. Imposible cargar la cantidad.");
+        }
+        return cantidad;
+    }
+
+    public static ArrayList<ProyectosEntity> proyectosGestionProvPieza(String codProveedor, String codPieza) {
+        ArrayList<ProyectosEntity> proyectos = new ArrayList<>();
+        if (sessionFactory != null) {
+            Session session = null;
+            try {
+                session = sessionFactory.openSession();
+            } catch (HibernateException ignored) { }
+
+            if (session != null) {
+                String hql = "select e.proyectosByCodProyecto " +
+                        "from GestionEntity e " +
+                        "where e.proveedoresByCodProveedor.codigo='" + codProveedor + "'" +
+                        " and e.piezasByCodPieza.codigo='" + codPieza + "'";
+                Query q = session.createQuery(hql);
+
+                List<ProyectosEntity> lista = q.list();
+                proyectos.addAll(lista);
+
+                session.close();
+            } else {
+                System.out.println("No se pudo abrir una sesión. Imposible cargar la lista de proyectos.");
+            }
+        } else {
+            System.out.println("SessionFactory no existente. Imposible cargar la lista de proyectos.");
+        }
+        return proyectos;
+    }
+
+    public static ArrayList<PiezasEntity> piezasGestionProv(String codProveedor) {
+        ArrayList<PiezasEntity> piezas = new ArrayList<>();
+        if (sessionFactory != null) {
+            Session session = null;
+            try {
+                session = sessionFactory.openSession();
+            } catch (HibernateException ignored) { }
+
+            if (session != null) {
+                String hql = "select e.piezasByCodPieza from GestionEntity e where e.proveedoresByCodProveedor.codigo='" + codProveedor + "'";
+                Query q = session.createQuery(hql);
+
+                List<PiezasEntity> lista = q.list();
+                piezas.addAll(lista);
+
+                session.close();
+            } else {
+                System.out.println("No se pudo abrir una sesión. Imposible cargar la lista de piezas.");
+            }
+        } else {
+            System.out.println("SessionFactory no existente. Imposible cargar la lista de piezas.");
+        }
+        return piezas;
+    }
+
+    public static ArrayList<ProveedoresEntity> proveedoresGestion() {
+        ArrayList<ProveedoresEntity> proveedores = new ArrayList<>();
+        if (sessionFactory != null) {
+            Session session = null;
+            try {
+                session = sessionFactory.openSession();
+            } catch (HibernateException ignored) { }
+
+            if (session != null) {
+                String hql = "select e.proveedoresByCodProveedor from GestionEntity e";
+                Query q = session.createQuery(hql);
+
+                List<ProveedoresEntity> lista = q.list();
+                proveedores.addAll(lista);
+
+                session.close();
+            } else {
+                System.out.println("No se pudo abrir una sesión. Imposible cargar la lista de proveedores.");
+            }
+        } else {
+            System.out.println("SessionFactory no existente. Imposible cargar la lista de proveedores.");
+        }
+        return proveedores;
     }
 
     public static ArrayList<ProveedoresEntity> proveedores() {

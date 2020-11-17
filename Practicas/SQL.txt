@@ -1,0 +1,72 @@
+-- DELETES
+DELETE FROM gestion;
+DELETE FROM piezas;
+DELETE FROM proveedores;
+DELETE FROM proyectos;
+
+-- DROPS
+DROP TABLE gestion;
+DROP TABLE piezas;
+DROP TABLE proveedores;
+DROP TABLE proyectos;
+
+-- QUERYS
+SELECT * FROM gestion;
+SELECT * FROM piezas;
+SELECT * FROM proveedores;
+SELECT * FROM proyectos;
+
+-- IMPORTANTE
+COMMIT;
+
+-- INSERTS 
+-- --------- PROOVEEDORES
+INSERT INTO PROVEEDORES(codigo, nombre, apellidos, direccion) VALUES('A00001', 'Ignacio', 'Álvarez Jimenez', 'C/Orio, 11. 01010');
+INSERT INTO PROVEEDORES(codigo, nombre, apellidos, direccion) VALUES('A00002', 'Irune', 'Méndez Roldán', 'C/Panamá, 3. 01012');
+INSERT INTO PROVEEDORES(codigo, nombre, apellidos, direccion) VALUES('A00003', 'María', 'Delgado Pritchet', 'C/Hollywood, 5. 01018');
+INSERT INTO PROVEEDORES(codigo, nombre, apellidos, direccion) VALUES('A00004', 'Daniel', 'Tamargo Saiz', 'C/Ori, 18. 01010');
+            
+-- --------- PROYECTOS
+INSERT INTO PROYECTOS(codigo, nombre, ciudad)
+			VALUES('A00001', 'Proyecto 1', 'Vitoria');
+            
+-- --------- PIEZAS
+INSERT INTO PIEZAS(codigo, nombre, precio, descripcion)
+		VALUES ('A00001', 'Pieza 1', 10, 'Pieza vital para la creación de los proyectos');
+
+-- --------- GESTIONES
+INSERT INTO GESTION(codProveedor, codPieza, codProyecto, cantidad) VALUES('A00001', 'A00001', 'A00001', 2.5);
+INSERT INTO GESTION(codProveedor, codPieza, codProyecto, cantidad) VALUES('A00002', 'A00001', 'A00001', 4);
+
+-- CREATES
+CREATE TABLE piezas(
+	codigo VARCHAR(6) PRIMARY KEY NOT NULL,
+    nombre VARCHAR(20) NOT NULL,
+    precio FLOAT NOT NULL,
+    descripcion TEXT
+);
+
+CREATE TABLE proveedores(
+	codigo VARCHAR(6) PRIMARY KEY NOT NULL,
+    nombre VARCHAR(20) NOT NULL,
+    apellidos VARCHAR(30) NOT NULL,
+    direccion VARCHAR(40) NOT NULL
+);
+
+CREATE TABLE proyectos(
+	codigo VARCHAR(6) PRIMARY KEY NOT NULL,
+    nombre VARCHAR(40) NOT NULL,
+    ciudad VARCHAR(40)
+);
+
+CREATE TABLE gestion(
+	codigo INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+	codProveedor VARCHAR(6) NOT NULL,
+    codPieza VARCHAR(6) NOT NULL,
+    codProyecto VARCHAR(6) NOT NULL,
+    cantidad FLOAT,
+    -- CONSTRAINT gestion_pk PRIMARY KEY(codProveedor, codPieza, codProyecto),
+    CONSTRAINT gestion_fk_proveedor FOREIGN KEY (codProveedor) REFERENCES proveedores(codigo) ON DELETE CASCADE,
+    CONSTRAINT gestion_fk_pieza FOREIGN KEY (codPieza) REFERENCES piezas(codigo) ON DELETE CASCADE,
+    CONSTRAINT gestion_fk_proyecto FOREIGN KEY (codProyecto) REFERENCES proyectos(codigo)  ON DELETE CASCADE
+);

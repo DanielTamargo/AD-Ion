@@ -1,5 +1,6 @@
 package com.tamargo.util;
 
+import com.tamargo.GestionEntity;
 import com.tamargo.PiezasEntity;
 import com.tamargo.ProveedoresEntity;
 import com.tamargo.ProyectosEntity;
@@ -31,6 +32,65 @@ public class BorrarDatos {
         dialog.setVisible(true);
     }
 
+    public static boolean eliminarGestion(String codProv, String codPieza, String codProyecto) {
+        boolean eliminado = true;
+
+        String titulo = "Error";
+
+        if (sessionFactory != null) {
+            Session session = null;
+            try {
+                session = sessionFactory.openSession();
+            } catch (HibernateException ignored) { }
+
+            if (session != null) {
+                String hql = "from GestionEntity p " +
+                        " where p.proveedoresByCodProveedor.codigo='" + codProv + "' " +
+                        " and p.piezasByCodPieza.codigo='" + codPieza + "' " +
+                        " and p.proyectosByCodProyecto.codigo='" + codProyecto + "'";
+                try {
+                    Transaction tx = session.beginTransaction();
+                    Query q = session.createQuery(hql).setMaxResults(1);
+                    GestionEntity prov = (GestionEntity) q.uniqueResult();
+                    session.delete(prov);
+                    tx.commit();
+
+                    mostrarJOptionPane("Gestion Eliminada",
+                            "Gestion eliminada con éxito.",
+                            1);
+                } catch (IllegalArgumentException ex) {
+                    String mensaje = "Error al eliminar. No existe la gestion en cuestión";
+                    mostrarJOptionPane(titulo, mensaje, 0);
+                    System.out.println("Error al eliminar. No existe la gestion en cuestión");
+                    eliminado = false;
+                } catch (ConstraintViolationException ex) {
+                    String mensaje = "Error al eliminar. Se está incumpliendo la constraint:\n" + ex.getLocalizedMessage();
+                    mostrarJOptionPane(titulo, mensaje, 0);
+                    System.out.println("Error al eliminar. Se está incumpliendo la constraint:\n" + ex.getLocalizedMessage());
+                    eliminado = false;
+                } catch (TransientPropertyValueException ex) {
+                    String mensaje = "Error al eliminar. No se puede eliminar una gestion\nque no existe o está cargada correctamente";
+                    mostrarJOptionPane(titulo, mensaje, 0);
+                    System.out.println("Error al eliminar. No se puede eliminar una gestion\nque no existe o está cargada correctamente");
+                    eliminado = false;
+                }
+                session.close();
+            } else {
+                String mensaje = "No se pudo abrir una sesión. Imposible cargar el gestion.";
+                mostrarJOptionPane(titulo, mensaje, 0);
+                System.out.println("No se pudo abrir una sesión. Imposible eliminar el gestion.");
+                eliminado = false;
+            }
+        } else {
+            String mensaje = "SessionFactory no existente. Imposible realizar la acción.";
+            mostrarJOptionPane(titulo, mensaje, 0);
+            System.out.println("SessionFactory no existente. Imposible realizar la acción.");
+            eliminado = false;
+        }
+
+        return eliminado;
+    }
+    
     public static boolean eliminarProveedor(String codigoProv) {
         boolean eliminado = true;
 
@@ -67,7 +127,7 @@ public class BorrarDatos {
                 } catch (TransientPropertyValueException ex) {
                     String mensaje = "Error al eliminar. No se puede eliminar un proveedor\nque no existe o está cargado correctamente";
                     mostrarJOptionPane(titulo, mensaje, 0);
-                    System.out.println("Error al eliminar. No se puede eliminar un proveedor\nque no existe o está cargaddo correctamente");
+                    System.out.println("Error al eliminar. No se puede eliminar un proveedor\nque no existe o está cargado correctamente");
                     eliminado = false;
                 }
                 session.close();
@@ -78,9 +138,9 @@ public class BorrarDatos {
                 eliminado = false;
             }
         } else {
-            String mensaje = "SessionFactory no existente. Imposible cargar la lista el proveedor.";
+            String mensaje = "SessionFactory no existente. Imposible realizar la acción.";
             mostrarJOptionPane(titulo, mensaje, 0);
-            System.out.println("SessionFactory no existente. Imposible cargar la lista el proveedor.");
+            System.out.println("SessionFactory no existente. Imposible realizar la acción.");
             eliminado = false;
         }
 
@@ -121,22 +181,22 @@ public class BorrarDatos {
                     System.out.println("Error al eliminar. Se está incumpliendo la constraint:\n" + ex.getLocalizedMessage());
                     eliminado = false;
                 } catch (TransientPropertyValueException ex) {
-                    String mensaje = "Error al eliminar. No se puede eliminar un pieza\nque no existe o está cargado correctamente";
+                    String mensaje = "Error al eliminar. No se puede eliminar una pieza\nque no existe o está cargada correctamente";
                     mostrarJOptionPane(titulo, mensaje, 0);
-                    System.out.println("Error al eliminar. No se puede eliminar un pieza\nque no existe o está cargaddo correctamente");
+                    System.out.println("Error al eliminar. No se puede eliminar una pieza\nque no existe o está cargada correctamente");
                     eliminado = false;
                 }
                 session.close();
             } else {
-                String mensaje = "No se pudo abrir una sesión. Imposible cargar la pieza.";
+                String mensaje = "No se pudo abrir una sesión. Imposible realizar la acción.";
                 mostrarJOptionPane(titulo, mensaje, 0);
-                System.out.println("No se pudo abrir una sesión. Imposible eliminar la pieza.");
+                System.out.println("No se pudo abrir una sesión. Imposible realizar la acción.");
                 eliminado = false;
             }
         } else {
-            String mensaje = "SessionFactory no existente. Imposible cargar la lista la pieza.";
+            String mensaje = "SessionFactory no existente.Imposible realizar la acción.";
             mostrarJOptionPane(titulo, mensaje, 0);
-            System.out.println("SessionFactory no existente. Imposible cargar la lista la pieza.");
+            System.out.println("SessionFactory no existente. Imposible realizar la acción.");
             eliminado = false;
         }
 
@@ -179,7 +239,7 @@ public class BorrarDatos {
                 } catch (TransientPropertyValueException ex) {
                     String mensaje = "Error al eliminar. No se puede eliminar un proyecto\nque no existe o está cargado correctamente";
                     mostrarJOptionPane(titulo, mensaje, 0);
-                    System.out.println("Error al eliminar. No se puede eliminar un proyecto\nque no existe o está cargaddo correctamente");
+                    System.out.println("Error al eliminar. No se puede eliminar un proyecto\nque no existe o está cargado correctamente");
                     eliminado = false;
                 }
                 session.close();
@@ -190,9 +250,9 @@ public class BorrarDatos {
                 eliminado = false;
             }
         } else {
-            String mensaje = "SessionFactory no existente. Imposible cargar la lista el proyecto.";
+            String mensaje = "SessionFactory no existente. Imposible realizar la acción.";
             mostrarJOptionPane(titulo, mensaje, 0);
-            System.out.println("SessionFactory no existente. Imposible cargar la lista el proyecto.");
+            System.out.println("SessionFactory no existente. Imposible realizar la acción.");
             eliminado = false;
         }
 

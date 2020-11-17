@@ -1,5 +1,6 @@
 package com.tamargo.ventanas;
 
+import com.sun.istack.Nullable;
 import com.tamargo.GestionEntity;
 import com.tamargo.PiezasEntity;
 import com.tamargo.ProveedoresEntity;
@@ -21,6 +22,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 public class VentanaPrincipal {
@@ -28,6 +30,8 @@ public class VentanaPrincipal {
     private JFrame ventanaPrincipal;
     private JPanel panel;
     private JPanel panelDatos;
+
+    private int numVentana = 1;
 
     // ArrayLists con los datos
     private ArrayList<ProveedoresEntity> proveedores = new ArrayList<>();
@@ -80,6 +84,30 @@ public class VentanaPrincipal {
     private JTextField t_proyCiudad;
     private JLabel l_paginasProy;
     private ArrayList<ProyectosEntity> proyectosComboBox = new ArrayList<>();
+
+    // Gestiones
+    private JComboBox<String> cb_gestProveedor;
+    private JComboBox<String> cb_gestPieza;
+    private JComboBox<String> cb_gestProyecto;
+    private ArrayList<ProveedoresEntity> gestProveedores = new ArrayList<>();
+    private ArrayList<PiezasEntity> gestPiezas = new ArrayList<>();
+    private ArrayList<ProyectosEntity> gestProyectos = new ArrayList<>();
+    private JButton nuevaGestion;
+    private JButton borrarGestion;
+    private JButton editarGestion;
+    private JButton listarGestiones;
+    private JPanel gesPanel;
+    private JTextField t_gesNomProveedor;
+    private JTextField t_gesDirProveedor;
+    private JTextField t_gesNomPieza;
+    private JTextField t_gesPrecioPieza;
+    private JTextField t_gesNomProyecto;
+    private JTextField t_gesCiudadProyecto;
+    private JTextField t_gesCantidad;
+    private boolean insertando = false;
+    private ArrayList<ProveedoresEntity> proveedoresNuevaGestion = new ArrayList<>();
+    private ArrayList<PiezasEntity> piezasNuevaGestion = new ArrayList<>();
+    private ArrayList<ProyectosEntity> proyectosNuevaGestion = new ArrayList<>();
 
     // Dimensiones
     private final Dimension dimPanelDatos = new Dimension(700, 500);
@@ -156,7 +184,7 @@ public class VentanaPrincipal {
         okButton.addActionListener(e -> dialog.dispose());
         dialog.setVisible(true);
     }
-    public void mostrarJOptionPaneEliminar(int tipo, String codigo) {
+    public void mostrarJOptionPaneEliminar(int tipo, String codigo, String codigo2, String codigo3) {
         JButton noButton = new JButton("Mejor no");
         JButton eliminarButton = new JButton("Eliminar");
         noButton.setFocusPainted(false);
@@ -173,7 +201,7 @@ public class VentanaPrincipal {
         else if (tipo == 3)
             titulo += " Proyecto " + codigo;
         else if (tipo == 4)
-            titulo += " Gestión " + codigo;
+            titulo += " Gestión";
 
         final JOptionPane pane = new JOptionPane("¿Estás seguro?\n" +
                 mensaje, JOptionPane.WARNING_MESSAGE, JOptionPane.YES_NO_OPTION, null, options);
@@ -194,6 +222,8 @@ public class VentanaPrincipal {
                     eliminarPieza(codigo);
                 else if (tipo == 3)
                     eliminarProyecto(codigo);
+                else if (tipo == 4)
+                    eliminarGestion(codigo, codigo2, codigo3);
 
                 dialog.dispose();
             }
@@ -763,6 +793,534 @@ public class VentanaPrincipal {
         foto.setIcon(new ImageIcon(gif));
     }
 
+    // ADMINISTRACIÓN GESTIÓN
+    public void cargarVentanaAdministracionGestion() {
+        System.out.println("  Cargando ventana");
+        insertando = false;
+        try {
+            panelDatos.removeAll();
+            panelDatos.repaint();
+        } catch (Exception ignored) { }
+
+        panelDatos.setLayout(null);
+        confPanel(panelDatos);
+
+        // BOTONES EN EL TOP
+        nuevaGestion = new JButton("Nueva Gestión");
+        confBoton(nuevaGestion, dimBoton);
+        panelDatos.add(nuevaGestion);
+        nuevaGestion.setBounds(15, 20, dimBoton.width + 10, dimBoton.height);
+
+        editarGestion = new JButton("Editar Gestión");
+        confBoton(editarGestion, dimBoton);
+        panelDatos.add(editarGestion);
+        editarGestion.setBounds(185, 20, dimBoton.width + 10, dimBoton.height);
+
+        borrarGestion = new JButton("Borrar Gestión");
+        confBoton(borrarGestion, dimBoton);
+        panelDatos.add(borrarGestion);
+        borrarGestion.setBounds(355, 20, dimBoton.width + 10, dimBoton.height);
+
+        listarGestiones = new JButton("Listar Gestiones");
+        confBoton(listarGestiones, dimBoton);
+        panelDatos.add(listarGestiones);
+        listarGestiones.setBounds(525, 20, dimBoton.width + 10, dimBoton.height);
+
+        // LINEA
+        JPanel linea = new JPanel();
+        linea.setLayout(null);
+        linea.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        panelDatos.add(linea);
+        linea.setBounds(0, 70, dimPanelDatos.width, 1);
+
+        int anchuraLabel = 80;
+        int anchuraComboBox = 120;
+
+        // VAMOS A UTILIZAR OTRO JPANEL DONDE INTERCALAREMOS ENTRE MOSTRAR LOS DATOS Y MOSTRAR EL LISTADO
+        try {
+            gesPanel.removeAll();
+            gesPanel.repaint();
+        } catch (Exception ignored) { }
+        gesPanel = new JPanel();
+        gesPanel.setLayout(null);
+        confPanel(gesPanel);
+        panelDatos.add(gesPanel);
+        gesPanel.setBounds(0, 0, dimPanelDatos.width, dimPanelDatos.height);
+
+        // PROVEEDOR
+        JLabel l_proveedor = new JLabel("Proveedor", SwingConstants.RIGHT);
+        confLabel(l_proveedor);
+        gesPanel.add(l_proveedor);
+        l_proveedor.setBounds(15, 110, anchuraLabel, dimLabel.height);
+
+        cb_gestProveedor = new JComboBox<String>();
+        gesPanel.add(cb_gestProveedor);
+        cb_gestProveedor.setBounds((15 + anchuraLabel + 10), 108, anchuraComboBox, dimTextField.height);
+        cb_gestProveedor.addItem("Proveedores");
+
+        t_gesNomProveedor = new JTextField();
+        gesPanel.add(t_gesNomProveedor);
+        t_gesNomProveedor.setBounds((15 + anchuraLabel + 10 + anchuraComboBox + 10),
+                108, (650 - (15 + anchuraLabel + 10 + anchuraComboBox + 10)), dimTextField.height);
+        t_gesNomProveedor.setEditable(false);
+
+        t_gesDirProveedor = new JTextField();
+        gesPanel.add(t_gesDirProveedor);
+        t_gesDirProveedor.setBounds((15 + anchuraLabel + 10 + anchuraComboBox + 10),
+                140, (650 - (15 + anchuraLabel + 10 + anchuraComboBox + 10)), dimTextField.height);
+        t_gesDirProveedor.setEditable(false);
+
+        // PIEZA
+        JLabel l_pieza = new JLabel("Pieza", SwingConstants.RIGHT);
+        confLabel(l_pieza);
+        gesPanel.add(l_pieza);
+        l_pieza.setBounds(15, 210, anchuraLabel, dimLabel.height);
+
+        cb_gestPieza = new JComboBox<String>();
+        gesPanel.add(cb_gestPieza);
+        cb_gestPieza.setBounds((15 + anchuraLabel + 10), 208, anchuraComboBox, dimTextField.height);
+        cb_gestPieza.addItem("Piezas");
+
+        t_gesNomPieza = new JTextField();
+        gesPanel.add(t_gesNomPieza);
+        t_gesNomPieza.setBounds((15 + anchuraLabel + 10 + anchuraComboBox + 10),
+                208, (650 - (15 + anchuraLabel + 10 + anchuraComboBox + 10)), dimTextField.height);
+        t_gesNomPieza.setEditable(false);
+
+        t_gesPrecioPieza = new JTextField();
+        gesPanel.add(t_gesPrecioPieza);
+        t_gesPrecioPieza.setBounds((15 + anchuraLabel + 10 + anchuraComboBox + 10),
+                240, 100, dimTextField.height);
+        t_gesPrecioPieza.setEditable(false);
+
+        // PROYECTO
+        JLabel l_proyecto = new JLabel("Proyecto", SwingConstants.RIGHT);
+        confLabel(l_proyecto);
+        gesPanel.add(l_proyecto);
+        l_proyecto.setBounds(15, 310, anchuraLabel, dimLabel.height);
+
+        cb_gestProyecto = new JComboBox<String>();
+        gesPanel.add(cb_gestProyecto);
+        cb_gestProyecto.setBounds((15 + anchuraLabel + 10), 308, anchuraComboBox, dimTextField.height);
+        cb_gestProyecto.addItem("Proyectos");
+
+        t_gesNomProyecto = new JTextField();
+        gesPanel.add(t_gesNomProyecto);
+        t_gesNomProyecto.setBounds((15 + anchuraLabel + 10 + anchuraComboBox + 10),
+                308, (650 - (15 + anchuraLabel + 10 + anchuraComboBox + 10)), dimTextField.height);
+        t_gesNomProyecto.setEditable(false);
+
+        t_gesCiudadProyecto = new JTextField();
+        gesPanel.add(t_gesCiudadProyecto);
+        t_gesCiudadProyecto.setBounds((15 + anchuraLabel + 10 + anchuraComboBox + 10),
+                340, (650 - (15 + anchuraLabel + 10 + anchuraComboBox + 10)), dimTextField.height);
+        t_gesCiudadProyecto.setEditable(false);
+
+        // CANTIDAD
+        JLabel l_cantidad = new JLabel("Cantidad", SwingConstants.RIGHT);
+        confLabel(l_cantidad);
+        gesPanel.add(l_cantidad);
+        l_cantidad.setBounds(15, 410, anchuraLabel, dimLabel.height);
+
+        t_gesCantidad = new JTextField();
+        gesPanel.add(t_gesCantidad);
+        t_gesCantidad.setBounds((15 + anchuraLabel + 10), 408, anchuraComboBox, dimTextField.height);
+        //t_gesCantidad.setEditable(false);
+
+        // LISTENERS
+        nuevaGestion.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                editarGestion.setText("Insertar");
+                editarGestion.setEnabled(true);
+                borrarGestion.setText("Cancelar");
+                borrarGestion.setEnabled(true);
+                nuevaGestion.setEnabled(false);
+                listarGestiones.setEnabled(false);
+
+                gestionPrepararNuevaGestion();
+            }
+        });
+        editarGestion.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (editarGestion.getText().equalsIgnoreCase("Insertar")) {
+                    // TODO INSERTAR NUEVA GESTIÓN
+
+                    reanudarVentanaAdminGestion();
+                } else {
+                    // TODO EDITAR LA CANTIDAD DE LA GESTIÓN SELECCIONADA
+                }
+            }
+        });
+        borrarGestion.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (borrarGestion.getText().equalsIgnoreCase("Cancelar")) {
+                    reanudarVentanaAdminGestion();
+                } else {
+                    try {
+                        ProveedoresEntity prov = gestProveedores.get(cb_gestProveedor.getSelectedIndex());
+                        PiezasEntity pieza = gestPiezas.get(cb_gestPieza.getSelectedIndex());
+                        ProyectosEntity proyecto = gestProyectos.get(cb_gestProyecto.getSelectedIndex());
+                        mostrarJOptionPaneEliminar(4, prov.getCodigo(), pieza.getCodigo(), proyecto.getCodigo());
+                    } catch (NullPointerException | ObjectNotFoundException | IllegalArgumentException ignored) {}
+                }
+            }
+        });
+        listarGestiones.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (listarGestiones.getText().equalsIgnoreCase("Volver")) {
+                    // TODO MOSTRAR PANEL CON LOS DATOS
+
+
+                    listarGestiones.setText("Listar Gestiones");
+                    nuevaGestion.setEnabled(true);
+                    editarGestion.setEnabled(true);
+                    borrarGestion.setEnabled(true);
+                } else {
+                    // TODO MOSTRAR PANEL CON EL JTABLE
+
+                    listarGestiones.setText("Volver");
+                    nuevaGestion.setEnabled(false);
+                    editarGestion.setEnabled(false);
+                    borrarGestion.setEnabled(false);
+                }
+            }
+        });
+        cb_gestProveedor.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!insertando)
+                    gestionCargarDatosProveedor();
+                else {
+                    // CON LAS PIEZAS HACER UN METODO QUE RECOGA EL NUMERO DE COD PROV + COD PIEZA Y MIRE
+                    // IF TOTALPIEZAPROV >= NUMPROYECTOS
+                    ProveedoresEntity prov = null;
+                    try {
+                        prov = proveedoresNuevaGestion.get(cb_gestProveedor.getSelectedIndex());
+                    } catch (NullPointerException | IllegalArgumentException ignored) {}
+                    if (prov != null) {
+                        DefaultComboBoxModel<String> modelo = new DefaultComboBoxModel<>();
+                        piezasNuevaGestion = new ArrayList<>();
+                        piezas = CargarDatos.piezas();
+                        for (PiezasEntity pieza : piezas) {
+                            if (CargarDatos.cargarNumProvPiezaGestion(prov.getCodigo(), pieza.getCodigo()) < CargarDatos.cargarNumProyectos()) {
+                                piezasNuevaGestion.add(pieza);
+                                modelo.addElement(pieza.getCodigo());
+                            }
+                        }
+                        cb_gestPieza.setModel(modelo);
+                        if (modelo.getSize() > 0)
+                            cb_gestPieza.setSelectedIndex(0);
+                        else {
+                            t_gesNomPieza.setText("");
+                            t_gesPrecioPieza.setText("");
+                            t_gesNomProyecto.setText("");
+                            t_gesCiudadProyecto.setText("");
+                        }
+                        gestionCargarDatosProveedor();
+                    }
+                }
+            }
+        });
+        cb_gestPieza.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!insertando)
+                    gestionCargarDatosPieza();
+                else {
+                    // TODO no actualiza bien
+                    PiezasEntity pieza = null;
+                    ProveedoresEntity prov = null;
+                    try {
+                        prov = proveedoresNuevaGestion.get(cb_gestProveedor.getSelectedIndex());
+                        pieza = piezasNuevaGestion.get(cb_gestPieza.getSelectedIndex());
+                    } catch (NullPointerException | IllegalArgumentException ignored) {}
+                    if (pieza != null && prov != null) {
+                        DefaultComboBoxModel<String> modelo = new DefaultComboBoxModel<>();
+                        proyectosNuevaGestion = new ArrayList<>();
+                        proyectos = CargarDatos.proyectos();
+                        for (ProyectosEntity proyecto: proyectos) {
+                            if (CargarDatos.cargarNumProvPiezaProyGestion(prov.getCodigo(), pieza.getCodigo(), proyecto.getCodigo()) < proyectos.size()) {
+                                if (!CargarDatos.gestionProvPiezProyExiste(prov.getCodigo(), pieza.getCodigo(), proyecto.getCodigo())) {
+                                    proyectosNuevaGestion.add(proyecto);
+                                    modelo.addElement(proyecto.getCodigo());
+                                }
+                            }
+                        }
+                        cb_gestProyecto.setModel(modelo);
+                        if (modelo.getSize() > 0)
+                            cb_gestProyecto.setSelectedIndex(0);
+                        else {
+                            t_gesNomProyecto.setText("");
+                            t_gesCiudadProyecto.setText("");
+                        }
+                        gestionCargarDatosPieza();
+                    }
+                }
+            }
+        });
+        cb_gestProyecto.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!insertando)
+                    gestionCargarDatosProyecto();
+                else {
+                    ProyectosEntity proyecto = null;
+                    try {
+                        proyecto = proyectosNuevaGestion.get(cb_gestProyecto.getSelectedIndex());
+                        gestionCargarDatosProyecto();
+                    } catch (NullPointerException | IllegalArgumentException ignored) {}
+                }
+            }
+        });
+
+        recargarDatosVentanaAdminGestion();
+        System.out.println("  Ventana cargada\n");
+    }
+    public void gestionPrepararNuevaGestion() {
+        ArrayList<ProveedoresEntity> proveedores = CargarDatos.proveedores();
+        long numPiezas = CargarDatos.cargarNumPiezas();
+        long numProyectos = CargarDatos.cargarNumProyectos();
+        if (proveedores.size() > 0 && numPiezas > 0 && numProyectos > 0) {
+            boolean correcto = false;
+            //ArrayList<ProveedoresEntity> proveedoresGestion = CargarDatos.proveedoresGestion();
+            for (ProveedoresEntity prov: proveedores) {
+                ArrayList<PiezasEntity> piezasProveedor = CargarDatos.piezasGestionProv(prov.getCodigo());
+                if (piezasProveedor.size() <= 0) {
+                    correcto = true;
+                    break;
+                }
+                for (PiezasEntity pieza: piezasProveedor) {
+                    long numProyectosUsados = CargarDatos.proyectosGestionProvPieza(prov.getCodigo(), pieza.getCodigo()).size();
+                    if (numProyectosUsados < numProyectos) {
+                        correcto = true;
+                        break;
+                    }
+                }
+            }
+            if (correcto) {
+                gestionCargarDatosNuevaGestion(proveedores, numPiezas, numProyectos);
+            } else {
+                JButton nuevProv = new JButton("Nuevo Proveedor");
+                JButton nuevPieza = new JButton("Nueva Pieza");
+                JButton nuevProy = new JButton("Nuevo Proyecto");
+                JButton cancelar = new JButton("Cancelar");
+                nuevProv.setFocusPainted(false);
+                nuevPieza.setFocusPainted(false);
+                nuevProy.setFocusPainted(false);
+                cancelar.setFocusPainted(false);
+
+                Object[] options = {cancelar, nuevProv, nuevPieza, nuevProy};
+
+                String titulo = "Sin posibilidades";
+                String mensaje = "Parece que ya has cubierto todas las posibilidades.\n" +
+                        "Tendrás que crear nuevos proveedores, piezas o proyectos para poder crear nuevs gestiones.";
+
+
+                final JOptionPane pane = new JOptionPane(mensaje,
+                        JOptionPane.WARNING_MESSAGE, JOptionPane.YES_NO_OPTION, null, options);
+                JDialog dialog = pane.createDialog(titulo);
+                cancelar.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        dialog.dispose();
+                        reanudarVentanaAdminGestion();
+                    }
+                });
+                nuevProv.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        dialog.dispose();
+                        cargarVentanaProveedorGestion();
+                        numVentana = 3;
+                    }
+                });
+                nuevPieza.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        dialog.dispose();
+                        cargarVentanaPiezaGestion();
+                        numVentana = 7;
+                    }
+                });
+                nuevProy.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        dialog.dispose();
+                        cargarVentanaProyectoGestion();
+                        numVentana = 10;
+                    }
+                });
+                dialog.setVisible(true);
+            }
+        } else {
+            if (numPiezas <= 0) {
+                mostrarJOptionPane("Sin piezas",
+                        "¡No existen piezas! Tendrás que crearlas primero",
+                        2);
+                cargarVentanaPiezaGestion();
+                numVentana = 7;
+            } else if (numProyectos <= 0) {
+                mostrarJOptionPane("Sin proyectos",
+                        "¡No existen proyectos! Tendrás que crearlos primero",
+                        2);
+                cargarVentanaProyectoGestion();
+                numVentana = 10;
+            } else {
+                mostrarJOptionPane("Sin proveedores",
+                        "¡No existen proveedores! Tendrás que crearlos primero",
+                        2);
+                cargarVentanaProveedorGestion();
+                numVentana = 3;
+            }
+        }
+    }
+    public void gestionCargarDatosNuevaGestion(ArrayList<ProveedoresEntity> proveedores, long numPiezas, long numProyectos) {
+        insertando = true;
+        proveedoresNuevaGestion = new ArrayList<>();
+        DefaultComboBoxModel<String> modelo = new DefaultComboBoxModel<>();
+
+        // HACER COUNT DE LAS SUMAR(FOR -> NUMPIEZAS * NUMPROYECTOS)
+        // IF TOTAL >= PIEZAS * PROYECTOS
+        for (ProveedoresEntity prov: proveedores) {
+            if (CargarDatos.cargarNumProvGestion(prov.getCodigo()) < (numPiezas * numProyectos)) {
+                proveedoresNuevaGestion.add(prov);
+                modelo.addElement(prov.getCodigo());
+            }
+        }
+
+        cb_gestProveedor.setModel(modelo);
+        cb_gestProveedor.setSelectedIndex(0);
+
+    }
+    public void eliminarGestion(String codProv, String codPieza, String codProyecto) {
+        boolean eliminado = BorrarDatos.eliminarGestion(codProv, codPieza, codProyecto);
+        if (eliminado) {
+            recargarDatosVentanaAdminGestion();
+        }
+    }
+    public void gestionVaciarDatos() {
+        cb_gestProveedor.setModel(new DefaultComboBoxModel<String>());
+        cb_gestPieza.setModel(new DefaultComboBoxModel<String>());
+        cb_gestProyecto.setModel(new DefaultComboBoxModel<String>());
+        t_gesNomProveedor.setText("");
+        t_gesDirProveedor.setText("");
+        t_gesNomPieza.setText("");
+        t_gesPrecioPieza.setText("");
+        t_gesNomProyecto.setText("");
+        t_gesCiudadProyecto.setText("");
+        t_gesCantidad.setText("");
+    }
+    public void gestionCargarDatosProveedor() {
+        ProveedoresEntity prov = null;
+        if (!insertando)
+            prov = gestProveedores.get(cb_gestProveedor.getSelectedIndex());
+        else
+            prov = proveedoresNuevaGestion.get(cb_gestProveedor.getSelectedIndex());
+        t_gesNomProveedor.setText(prov.getNombre() + " " + prov.getApellidos());
+        t_gesDirProveedor.setText(prov.getDireccion());
+        try {
+            gestionCargarCantidad();
+        } catch (NullPointerException ignored) {}
+    }
+    public void gestionCargarDatosPieza() {
+        PiezasEntity pieza = null;
+        if (!insertando)
+            pieza = gestPiezas.get(cb_gestPieza.getSelectedIndex());
+        else
+            pieza = piezasNuevaGestion.get(cb_gestPieza.getSelectedIndex());
+        t_gesNomPieza.setText(pieza.getNombre());
+        t_gesPrecioPieza.setText(String.format("%.2f", pieza.getPrecio()));
+        try {
+            gestionCargarCantidad();
+        } catch (NullPointerException ignored) {}
+    }
+    public void gestionCargarDatosProyecto() {
+        ProyectosEntity proyecto = null;
+        if (!insertando)
+            proyecto = gestProyectos.get(cb_gestProyecto.getSelectedIndex());
+        else
+            proyecto = proyectosNuevaGestion.get(cb_gestProyecto.getSelectedIndex());
+        t_gesNomProyecto.setText(proyecto.getNombre());
+        t_gesCiudadProyecto.setText(proyecto.getCiudad());
+        try {
+            gestionCargarCantidad();
+        } catch (NullPointerException ignored) {}
+    }
+    public void gestionCargarCantidad() {
+        if (!insertando) {
+            ProveedoresEntity prov = gestProveedores.get(cb_gestProveedor.getSelectedIndex());
+            PiezasEntity pieza = gestPiezas.get(cb_gestPieza.getSelectedIndex());
+            ProyectosEntity proyecto = gestProyectos.get(cb_gestProyecto.getSelectedIndex());
+            double cantidad = CargarDatos.cantidadGestionProvPiezProyecto(prov.getCodigo(), pieza.getCodigo(), proyecto.getCodigo());
+            t_gesCantidad.setText(String.format("%.2f", cantidad));
+        }
+        else
+            t_gesCantidad.setText("");
+    }
+    public void reanudarVentanaAdminGestion() {
+        insertando = false;
+        editarGestion.setText("Editar Gestión");
+        borrarGestion.setText("Borrar Gestión");
+        nuevaGestion.setEnabled(true);
+        listarGestiones.setEnabled(true);
+        recargarDatosVentanaAdminGestion();
+    }
+    public void recargarDatosVentanaAdminGestion() {
+        gestProveedores = CargarDatos.proveedoresGestion();
+        if (gestProveedores.size() > 0) {
+            prepararComboBoxGestProveedores(gestProveedores);
+            gestionCargarProveedorPiezas();
+            gestionCargarProveedorPiezasProyecto();
+
+            cb_gestProveedor.setSelectedIndex(0);
+            cb_gestPieza.setSelectedIndex(0);
+            cb_gestProyecto.setSelectedIndex(0);
+        } else {
+            mostrarJOptionPane("No existen gestiones",
+                    "No existen gestiones en la BBDD, ¡inserta alguna!", 1);
+            editarGestion.setEnabled(false);
+            borrarGestion.setEnabled(false);
+            listarGestiones.setEnabled(false);
+            gestionVaciarDatos();
+        }
+    }
+    public void gestionCargarProveedorPiezas() {
+        gestPiezas = CargarDatos.piezasGestionProv(gestProveedores.get(cb_gestProveedor.getSelectedIndex()).getCodigo());
+        prepararComboBoxGestPiezas(gestPiezas);
+    }
+    public void gestionCargarProveedorPiezasProyecto() {
+        gestProyectos = CargarDatos.proyectosGestionProvPieza(
+                gestProveedores.get(cb_gestProveedor.getSelectedIndex()).getCodigo(),
+                gestPiezas.get(cb_gestPieza.getSelectedIndex()).getCodigo()
+        );
+        prepararComboBoxGestProyectos(gestProyectos);
+    }
+    public void prepararComboBoxGestProveedores(ArrayList<ProveedoresEntity> proveedores) {
+        DefaultComboBoxModel<String> modelo = new DefaultComboBoxModel<>();
+        for (ProveedoresEntity prov : proveedores) {
+            modelo.addElement(prov.getCodigo());
+        }
+        cb_gestProveedor.setModel(modelo);
+    }
+    public void prepararComboBoxGestPiezas(ArrayList<PiezasEntity> piezas) {
+        DefaultComboBoxModel<String> modelo = new DefaultComboBoxModel<>();
+        for (PiezasEntity pza : piezas) {
+            modelo.addElement(pza.getCodigo());
+        }
+        cb_gestPieza.setModel(modelo);
+    }
+    public void prepararComboBoxGestProyectos(ArrayList<ProyectosEntity> proyectos) {
+        DefaultComboBoxModel<String> modelo = new DefaultComboBoxModel<>();
+        for (ProyectosEntity proy : proyectos) {
+            modelo.addElement(proy.getCodigo());
+        }
+        cb_gestProyecto.setModel(modelo);
+    }
+
     // PIEZA
     public void cargarVentanaPiezaGestion() {
         System.out.println("  Cargando datos");
@@ -895,7 +1453,7 @@ public class VentanaPrincipal {
                     } catch (NullPointerException ignored) { }
 
                     if (pza != null) {
-                        mostrarJOptionPaneEliminar(2, pza.getCodigo());
+                        mostrarJOptionPaneEliminar(2, pza.getCodigo(), null, null);
                     }
 
                 } else {
@@ -1203,7 +1761,7 @@ public class VentanaPrincipal {
                     } catch (NullPointerException ignored) { }
 
                     if (proy != null) {
-                        mostrarJOptionPaneEliminar(3, proy.getCodigo());
+                        mostrarJOptionPaneEliminar(3, proy.getCodigo(), null, null);
                     }
 
                 } else {
@@ -1488,7 +2046,7 @@ public class VentanaPrincipal {
                     } catch (NullPointerException ignored) { }
 
                     if (prov != null) {
-                        mostrarJOptionPaneEliminar(1, prov.getCodigo());
+                        mostrarJOptionPaneEliminar(1, prov.getCodigo(), null, null);
                     }
 
                 } else {
@@ -1650,6 +2208,71 @@ public class VentanaPrincipal {
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Configurar Menú
+    public void menuGestionGlobal(JMenuBar menuBar) {
+        JMenu menu;
+        JMenuItem menuItem;
+
+        menu = new JMenu("Gestión Global");
+        menu.getAccessibleContext().setAccessibleDescription(
+                "Administra las gestiones y muestra estadísticas");
+        menuBar.add(menu);
+
+        menuItem = new JMenuItem("Administrar gestiones");
+        menu.add(menuItem);
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (numVentana != 14) {
+                    System.out.println("Gestión: Administración");
+                    cargarVentanaAdministracionGestion();
+                    numVentana = 14;
+                }
+            }
+        });
+
+        menuItem = new JMenuItem("Suministros por Proveedor");
+        menu.add(menuItem);
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (numVentana != 15) {
+                    System.out.println("Estadísticas: Suministros por Proveedor");
+                    // TODO CARGAR VENTANA SUMINISTROS POR PROVEEDOR
+
+                    numVentana = 15;
+                }
+            }
+        });
+
+        menuItem = new JMenuItem("Suministros por Piezas");
+        menu.add(menuItem);
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (numVentana != 16) {
+                    System.out.println("Estadísticas: Suministros por Piezas");
+                    // TODO CARGAR VENTANA SUMINISTROS POR PIEZAS
+
+                    numVentana = 16;
+                }
+            }
+        });
+
+        menuItem = new JMenuItem("Estadísticas");
+        menu.add(menuItem);
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (numVentana != 17) {
+                    System.out.println("Estadísticas: Generales");
+                    // TODO CARGAR VENTANA ESTADISTICAS
+
+                    numVentana = 17;
+                }
+            }
+        });
+    }
+
     public void menuProyectos(JMenuBar menuBar) {
         JMenu menu, subMenu;
         JMenuItem menuItem;
@@ -1664,8 +2287,11 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Proyectos: Gestión");
-                cargarVentanaProyectoGestion();
+                if (numVentana != 10) {
+                    System.out.println("Proyectos: Gestión");
+                    cargarVentanaProyectoGestion();
+                    numVentana = 10;
+                }
             }
         });
 
@@ -1677,8 +2303,11 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Proyectos: Búsqueda por Código");
-                cargarVentanaProyectoBuscar(1);
+                if (numVentana != 11) {
+                    System.out.println("Proyectos: Búsqueda por Código");
+                    cargarVentanaProyectoBuscar(1);
+                    numVentana = 11;
+                }
             }
         });
         menuItem = new JMenuItem("Por Nombre");
@@ -1686,8 +2315,11 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Proyectos: Búsqueda por Nombre");
-                cargarVentanaProyectoBuscar(2);
+                if (numVentana != 12) {
+                    System.out.println("Proyectos: Búsqueda por Nombre");
+                    cargarVentanaProyectoBuscar(2);
+                    numVentana = 12;
+                }
             }
         });
         menuItem = new JMenuItem("Por Ciudad");
@@ -1695,8 +2327,11 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Proyectos: Búsqueda por Ciudad");
-                cargarVentanaProyectoBuscar(3);
+                if (numVentana != 13) {
+                    System.out.println("Proyectos: Búsqueda por Ciudad");
+                    cargarVentanaProyectoBuscar(3);
+                    numVentana = 13;
+                }
             }
         });
 
@@ -1717,8 +2352,11 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Piezas: Gestión");
-                cargarVentanaPiezaGestion();
+                if (numVentana != 7) {
+                    System.out.println("Piezas: Gestión");
+                    cargarVentanaPiezaGestion();
+                    numVentana = 7;
+                }
             }
         });
 
@@ -1730,8 +2368,11 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Piezas: Búsqueda por Código");
-                cargarVentanaPiezaBuscar(1);
+                if (numVentana != 8) {
+                    System.out.println("Piezas: Búsqueda por Código");
+                    cargarVentanaPiezaBuscar(1);
+                    numVentana = 8;
+                }
             }
         });
 
@@ -1740,8 +2381,11 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Piezas: Búsqueda por Nombre");
-                cargarVentanaPiezaBuscar(2);
+                if (numVentana != 9) {
+                    System.out.println("Piezas: Búsqueda por Nombre");
+                    cargarVentanaPiezaBuscar(2);
+                    numVentana = 9;
+                }
             }
         });
 
@@ -1762,8 +2406,11 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Proveedores: Gestión");
-                cargarVentanaProveedorGestion();
+                if (numVentana != 3) {
+                    System.out.println("Proveedores: Gestión");
+                    cargarVentanaProveedorGestion();
+                    numVentana = 3;
+                }
             }
         });
 
@@ -1775,8 +2422,11 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Proveedores: Búsqueda por Código");
-                cargarVentanaProveedorBuscar(1);
+                if (numVentana != 4) {
+                    System.out.println("Proveedores: Búsqueda por Código");
+                    cargarVentanaProveedorBuscar(1);
+                    numVentana = 4;
+                }
             }
         });
 
@@ -1785,8 +2435,11 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Proveedores: Búsqueda por Nombre");
-                cargarVentanaProveedorBuscar(2);
+                if (numVentana != 5) {
+                    System.out.println("Proveedores: Búsqueda por Nombre");
+                    cargarVentanaProveedorBuscar(2);
+                    numVentana = 5;
+                }
             }
         });
 
@@ -1795,8 +2448,11 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Proveedores: Búsqueda por Dirección");
-                cargarVentanaProveedorBuscar(3);
+                if (numVentana != 6) {
+                    System.out.println("Proveedores: Búsqueda por Dirección");
+                    cargarVentanaProveedorBuscar(3);
+                    numVentana = 6;
+                }
             }
         });
 
@@ -1815,8 +2471,11 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Inicio: Cohete");
-                cargarVentanaInicio(1);
+                if (numVentana != 1) {
+                    System.out.println("Inicio: Cohete\n");
+                    cargarVentanaInicio(1);
+                    numVentana = 1;
+                }
             }
         });
 
@@ -1826,8 +2485,11 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Inicio: Tostada");
-                cargarVentanaInicio(2);
+                if (numVentana != 2) {
+                    System.out.println("Inicio: Tostada\n");
+                    cargarVentanaInicio(2);
+                    numVentana = 2;
+                }
             }
         });
 
@@ -1852,6 +2514,9 @@ public class VentanaPrincipal {
 
         // Proyectos
         menuProyectos(menuBar);
+
+        // Gestión Global
+        menuGestionGlobal(menuBar);
 
         // Cargamos la barra de menú configurada en la ventana
         ventanaPrincipal.setJMenuBar(menuBar);
