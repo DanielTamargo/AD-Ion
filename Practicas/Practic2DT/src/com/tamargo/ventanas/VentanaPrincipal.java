@@ -21,6 +21,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class VentanaPrincipal {
     // Base de la Ventana
@@ -92,21 +93,12 @@ public class VentanaPrincipal {
     private final Dimension dimTextArea = new Dimension(200, 75);
 
     public VentanaPrincipal() {
-        //configurarDimensions();
+        cargarVentanaInicio(1);
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Métodos iniciales
-    public void configurarDimensions() {
-        dimPanelDatos.setSize(700, 500);
-        dimLabel.setSize(200, 20);
-        dimTextField.setSize(200, 25);
-        dimTextFieldCodigo.setSize(75, 25);
-        dimBoton.setSize(150, 40);
-        dimBotonPeque.setSize(50, 50);
-        dimLista.setSize(250, 350);
-        dimScrollPane.setSize(255, 355);
-    }
+
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Métodos generales
@@ -748,7 +740,7 @@ public class VentanaPrincipal {
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Cargar Ventanas
     // INICIO
-    public void cargarVentanaInicio() {
+    public void cargarVentanaInicio(int numGif) {
         try {
             panelDatos.removeAll();
             panelDatos.repaint();
@@ -761,7 +753,14 @@ public class VentanaPrincipal {
         panelDatos.add(foto);
         foto.setBounds(0, 0, dimPanelDatos.width, dimPanelDatos.height);
 
+        String gif;
+        if (numGif == 2) {
+            gif = "./assets/2-tostada.gif";
+        } else {
+            gif = "./assets/1-cohete.gif";
+        }
 
+        foto.setIcon(new ImageIcon(gif));
     }
 
     // PIEZA
@@ -1808,34 +1807,32 @@ public class VentanaPrincipal {
         JMenu menu;
         JMenuItem menuItem;
 
-        menu = new JMenu("Menú 1");
-        //menu.setMnemonic(KeyEvent.VK_A);
-        menu.getAccessibleContext().setAccessibleDescription(
-                "The only menu in this program that has menu items");
-        menuBar.add(menu);
+        menu = new JMenu("Inicio");
 
         // Opciones del primer menú
-        menuItem = new JMenuItem("Hola");
-        //menuItem.setMnemonic(KeyEvent.VK_1);
+        menuItem = new JMenuItem("Cohete", new ImageIcon(".assets/1-cohete.png"));
         menu.add(menuItem);
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Hola");
+                System.out.println("Inicio: Cohete");
+                cargarVentanaInicio(1);
             }
         });
 
-        menuItem = new JMenuItem("Adiós",
-                new ImageIcon("images/middle.gif"));
+        menuItem = new JMenuItem("Tostada",
+                new ImageIcon(".assets/2-tostada.png"));
         menu.add(menuItem);
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Adiós");
+                System.out.println("Inicio: Tostada");
+                cargarVentanaInicio(2);
             }
         });
 
         menu.add(menuItem);
+        menuBar.add(menu);
     }
 
     public void configurarMenu() {
