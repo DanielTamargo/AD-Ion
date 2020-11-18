@@ -48,14 +48,12 @@ public class InsertarEditarDatos {
             if (session != null) {
                 try {
                     Transaction tx = session.beginTransaction();
-
+                    GestionEntity gestion = new GestionEntity();
+                    gestion.setCantidad(cantidad);
+                    gestion.setPiezasByCodPieza(pieza);
+                    gestion.setProveedoresByCodProveedor(prov);
+                    gestion.setProyectosByCodProyecto(proy);
                     if (tipoAccion == 1) {
-                        GestionEntity gestion = new GestionEntity();
-                        gestion.setCantidad(cantidad);
-                        gestion.setPiezasByCodPieza(pieza);
-                        gestion.setProveedoresByCodProveedor(prov);
-                        gestion.setProyectosByCodProyecto(proy);
-
                         session.save(gestion);
                         tx.commit();
                         mostrarJOptionPane("Proveedor Insertado",
@@ -68,7 +66,7 @@ public class InsertarEditarDatos {
                                 " and g.proyectosByCodProyecto.codigo='" + proy.getCodigo() + "'";
                         Query q = session.createQuery(hql).setMaxResults(1);
                         GestionEntity gest = (GestionEntity) q.uniqueResult();
-                        gest.actualizarDatos(gest);
+                        gest.actualizarDatos(gestion);
                         session.update(prov);
                         tx.commit();
                         mostrarJOptionPane("Gestion Editada",

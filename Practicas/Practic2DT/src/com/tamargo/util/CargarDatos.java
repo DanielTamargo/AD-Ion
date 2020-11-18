@@ -346,6 +346,31 @@ public class CargarDatos {
         return proveedores;
     }
 
+    public static ArrayList<GestionEntity> gestiones() {
+        ArrayList<GestionEntity> gestiones = new ArrayList<>();
+        if (sessionFactory != null) {
+            Session session = null;
+            try {
+                session = sessionFactory.openSession();
+            } catch (HibernateException ignored) { }
+
+            if (session != null) {
+                String hql = "from GestionEntity ";
+                Query q = session.createQuery(hql);
+                List<GestionEntity> lista = q.list();
+
+                gestiones.addAll(lista);
+
+                session.close();
+            } else {
+                System.out.println("No se pudo abrir una sesión. Imposible cargar la lista de gestiones.");
+            }
+        } else {
+            System.out.println("SessionFactory no existente. Imposible cargar la lista de gestiones.");
+        }
+        return gestiones;
+    }
+
     public static ArrayList<ProveedoresEntity> proveedores() {
         ArrayList<ProveedoresEntity> proveedores = new ArrayList<>();
         if (sessionFactory != null) {

@@ -4,6 +4,7 @@ import com.tamargo.GestionEntity;
 import com.tamargo.PiezasEntity;
 import com.tamargo.ProveedoresEntity;
 import com.tamargo.ProyectosEntity;
+import com.tamargo.tablas.ModeloListadoGestiones;
 import com.tamargo.util.BorrarDatos;
 import com.tamargo.util.CargarDatos;
 import com.tamargo.util.InsertarEditarDatos;
@@ -14,6 +15,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
@@ -770,320 +773,8 @@ public class VentanaPrincipal {
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Cargar Ventanas
-    // INICIO
-    public void cargarVentanaInicio(int numGif) {
-        try {
-            panelDatos.removeAll();
-            panelDatos.repaint();
-        } catch (Exception ignored) { }
-
-        panelDatos.setLayout(null);
-        confPanel(panelDatos);
-
-        JLabel foto = new JLabel();
-        panelDatos.add(foto);
-        foto.setBounds(0, 0, dimPanelDatos.width, dimPanelDatos.height);
-
-        String gif;
-        if (numGif == 2) {
-            gif = "./assets/2-tostada.gif";
-        } else {
-            gif = "./assets/1-cohete.gif";
-        }
-
-        foto.setIcon(new ImageIcon(gif));
-    }
-
-    // ADMINISTRACIÓN GESTIÓN
-    public void cargarVentanaAdministracionGestion() {
-        System.out.println("  Cargando ventana");
-        insertando = false;
-        try {
-            panelDatos.removeAll();
-            panelDatos.repaint();
-        } catch (Exception ignored) { }
-
-        panelDatos.setLayout(null);
-        confPanel(panelDatos);
-
-        // BOTONES EN EL TOP
-        nuevaGestion = new JButton("Nueva Gestión");
-        confBoton(nuevaGestion, dimBoton);
-        panelDatos.add(nuevaGestion);
-        nuevaGestion.setBounds(15, 20, dimBoton.width + 10, dimBoton.height);
-
-        editarGestion = new JButton("Editar Gestión");
-        confBoton(editarGestion, dimBoton);
-        panelDatos.add(editarGestion);
-        editarGestion.setBounds(185, 20, dimBoton.width + 10, dimBoton.height);
-
-        borrarGestion = new JButton("Borrar Gestión");
-        confBoton(borrarGestion, dimBoton);
-        panelDatos.add(borrarGestion);
-        borrarGestion.setBounds(355, 20, dimBoton.width + 10, dimBoton.height);
-
-        listarGestiones = new JButton("Listar Gestiones");
-        confBoton(listarGestiones, dimBoton);
-        panelDatos.add(listarGestiones);
-        listarGestiones.setBounds(525, 20, dimBoton.width + 10, dimBoton.height);
-
-        // LINEA
-        JPanel linea = new JPanel();
-        linea.setLayout(null);
-        linea.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        panelDatos.add(linea);
-        linea.setBounds(0, 70, dimPanelDatos.width, 1);
-
-        int anchuraLabel = 80;
-        int anchuraComboBox = 120;
-
-        // VAMOS A UTILIZAR OTRO JPANEL DONDE INTERCALAREMOS ENTRE MOSTRAR LOS DATOS Y MOSTRAR EL LISTADO
-        try {
-            gesPanel.removeAll();
-            gesPanel.repaint();
-        } catch (Exception ignored) { }
-        gesPanel = new JPanel();
-        gesPanel.setLayout(null);
-        confPanel(gesPanel);
-        panelDatos.add(gesPanel);
-        gesPanel.setBounds(0, 0, dimPanelDatos.width, dimPanelDatos.height);
-
-        // PROVEEDOR
-        JLabel l_proveedor = new JLabel("Proveedor", SwingConstants.RIGHT);
-        confLabel(l_proveedor);
-        gesPanel.add(l_proveedor);
-        l_proveedor.setBounds(15, 110, anchuraLabel, dimLabel.height);
-
-        cb_gestProveedor = new JComboBox<String>();
-        gesPanel.add(cb_gestProveedor);
-        cb_gestProveedor.setBounds((15 + anchuraLabel + 10), 108, anchuraComboBox, dimTextField.height);
-        cb_gestProveedor.addItem("Proveedores");
-
-        t_gesNomProveedor = new JTextField();
-        gesPanel.add(t_gesNomProveedor);
-        t_gesNomProveedor.setBounds((15 + anchuraLabel + 10 + anchuraComboBox + 10),
-                108, (650 - (15 + anchuraLabel + 10 + anchuraComboBox + 10)), dimTextField.height);
-        t_gesNomProveedor.setEditable(false);
-
-        t_gesDirProveedor = new JTextField();
-        gesPanel.add(t_gesDirProveedor);
-        t_gesDirProveedor.setBounds((15 + anchuraLabel + 10 + anchuraComboBox + 10),
-                140, (650 - (15 + anchuraLabel + 10 + anchuraComboBox + 10)), dimTextField.height);
-        t_gesDirProveedor.setEditable(false);
-
-        // PIEZA
-        JLabel l_pieza = new JLabel("Pieza", SwingConstants.RIGHT);
-        confLabel(l_pieza);
-        gesPanel.add(l_pieza);
-        l_pieza.setBounds(15, 210, anchuraLabel, dimLabel.height);
-
-        cb_gestPieza = new JComboBox<String>();
-        gesPanel.add(cb_gestPieza);
-        cb_gestPieza.setBounds((15 + anchuraLabel + 10), 208, anchuraComboBox, dimTextField.height);
-        cb_gestPieza.addItem("Piezas");
-
-        t_gesNomPieza = new JTextField();
-        gesPanel.add(t_gesNomPieza);
-        t_gesNomPieza.setBounds((15 + anchuraLabel + 10 + anchuraComboBox + 10),
-                208, (650 - (15 + anchuraLabel + 10 + anchuraComboBox + 10)), dimTextField.height);
-        t_gesNomPieza.setEditable(false);
-
-        t_gesPrecioPieza = new JTextField();
-        gesPanel.add(t_gesPrecioPieza);
-        t_gesPrecioPieza.setBounds((15 + anchuraLabel + 10 + anchuraComboBox + 10),
-                240, 100, dimTextField.height);
-        t_gesPrecioPieza.setEditable(false);
-
-        // PROYECTO
-        JLabel l_proyecto = new JLabel("Proyecto", SwingConstants.RIGHT);
-        confLabel(l_proyecto);
-        gesPanel.add(l_proyecto);
-        l_proyecto.setBounds(15, 310, anchuraLabel, dimLabel.height);
-
-        cb_gestProyecto = new JComboBox<String>();
-        gesPanel.add(cb_gestProyecto);
-        cb_gestProyecto.setBounds((15 + anchuraLabel + 10), 308, anchuraComboBox, dimTextField.height);
-        cb_gestProyecto.addItem("Proyectos");
-
-        t_gesNomProyecto = new JTextField();
-        gesPanel.add(t_gesNomProyecto);
-        t_gesNomProyecto.setBounds((15 + anchuraLabel + 10 + anchuraComboBox + 10),
-                308, (650 - (15 + anchuraLabel + 10 + anchuraComboBox + 10)), dimTextField.height);
-        t_gesNomProyecto.setEditable(false);
-
-        t_gesCiudadProyecto = new JTextField();
-        gesPanel.add(t_gesCiudadProyecto);
-        t_gesCiudadProyecto.setBounds((15 + anchuraLabel + 10 + anchuraComboBox + 10),
-                340, (650 - (15 + anchuraLabel + 10 + anchuraComboBox + 10)), dimTextField.height);
-        t_gesCiudadProyecto.setEditable(false);
-
-        // CANTIDAD
-        JLabel l_cantidad = new JLabel("Cantidad", SwingConstants.RIGHT);
-        confLabel(l_cantidad);
-        gesPanel.add(l_cantidad);
-        l_cantidad.setBounds(15, 410, anchuraLabel, dimLabel.height);
-
-        t_gesCantidad = new JTextField();
-        gesPanel.add(t_gesCantidad);
-        t_gesCantidad.setBounds((15 + anchuraLabel + 10), 408, anchuraComboBox, dimTextField.height);
-        //t_gesCantidad.setEditable(false);
-
-        // LISTENERS
-        nuevaGestion.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                editarGestion.setText("Insertar");
-                editarGestion.setEnabled(true);
-                borrarGestion.setText("Cancelar");
-                borrarGestion.setEnabled(true);
-                nuevaGestion.setEnabled(false);
-                listarGestiones.setEnabled(false);
-
-                gestionPrepararNuevaGestion();
-
-            }
-        });
-        editarGestion.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (editarGestion.getText().equalsIgnoreCase("Insertar")) {
-                    // TODO INSERTAR NUEVA GESTIÓN
-                    if (gestionInsertarNuevaGestion())
-                        reanudarVentanaAdminGestion();
-                } else {
-                    // TODO EDITAR LA CANTIDAD DE LA GESTIÓN SELECCIONADA
-                }
-            }
-        });
-        borrarGestion.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (borrarGestion.getText().equalsIgnoreCase("Cancelar")) {
-                    reanudarVentanaAdminGestion();
-                } else {
-                    try {
-                        ProveedoresEntity prov = gestProveedores.get(cb_gestProveedor.getSelectedIndex());
-                        PiezasEntity pieza = gestPiezas.get(cb_gestPieza.getSelectedIndex());
-                        ProyectosEntity proyecto = gestProyectos.get(cb_gestProyecto.getSelectedIndex());
-                        mostrarJOptionPaneEliminar(4, prov.getCodigo(), pieza.getCodigo(), proyecto.getCodigo());
-                    } catch (NullPointerException | ObjectNotFoundException | IllegalArgumentException ignored) {}
-                }
-            }
-        });
-        listarGestiones.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (listarGestiones.getText().equalsIgnoreCase("Volver")) {
-                    // TODO MOSTRAR PANEL CON LOS DATOS
-
-
-                    listarGestiones.setText("Listar Gestiones");
-                    nuevaGestion.setEnabled(true);
-                    editarGestion.setEnabled(true);
-                    borrarGestion.setEnabled(true);
-                } else {
-                    // TODO MOSTRAR PANEL CON EL JTABLE
-
-                    listarGestiones.setText("Volver");
-                    nuevaGestion.setEnabled(false);
-                    editarGestion.setEnabled(false);
-                    borrarGestion.setEnabled(false);
-                }
-            }
-        });
-        cb_gestProveedor.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (!insertando)
-                    gestionCargarDatosProveedor();
-                else {
-                    // CON LAS PIEZAS HACER UN METODO QUE RECOGA EL NUMERO DE COD PROV + COD PIEZA Y MIRE
-                    // IF TOTALPIEZAPROV >= NUMPROYECTOS
-                    ProveedoresEntity prov = null;
-                    try {
-                        prov = proveedoresNuevaGestion.get(cb_gestProveedor.getSelectedIndex());
-                    } catch (NullPointerException | IllegalArgumentException ignored) {}
-                    if (prov != null) {
-                        DefaultComboBoxModel<String> modelo = new DefaultComboBoxModel<>();
-                        piezasNuevaGestion = new ArrayList<>();
-                        piezas = CargarDatos.piezas();
-                        for (PiezasEntity pieza : piezas) {
-                            if (CargarDatos.cargarNumProvPiezaGestion(prov.getCodigo(), pieza.getCodigo()) < CargarDatos.cargarNumProyectos()) {
-                                piezasNuevaGestion.add(pieza);
-                                modelo.addElement(pieza.getCodigo());
-                            }
-                        }
-                        cb_gestPieza.setModel(modelo);
-                        if (modelo.getSize() > 0)
-                            cb_gestPieza.setSelectedIndex(0);
-                        else {
-                            t_gesNomPieza.setText("");
-                            t_gesPrecioPieza.setText("");
-                            t_gesNomProyecto.setText("");
-                            t_gesCiudadProyecto.setText("");
-                        }
-                        gestionCargarDatosProveedor();
-                    }
-                }
-            }
-        });
-        cb_gestPieza.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (!insertando)
-                    gestionCargarDatosPieza();
-                else {
-                    // TODO no actualiza bien
-                    PiezasEntity pieza = null;
-                    ProveedoresEntity prov = null;
-                    try {
-                        prov = proveedoresNuevaGestion.get(cb_gestProveedor.getSelectedIndex());
-                        pieza = piezasNuevaGestion.get(cb_gestPieza.getSelectedIndex());
-                    } catch (NullPointerException | IllegalArgumentException ignored) {}
-                    if (pieza != null && prov != null) {
-                        DefaultComboBoxModel<String> modelo = new DefaultComboBoxModel<>();
-                        proyectosNuevaGestion = new ArrayList<>();
-                        proyectos = CargarDatos.proyectos();
-                        for (ProyectosEntity proyecto: proyectos) {
-                            if (CargarDatos.cargarNumProvPiezaProyGestion(prov.getCodigo(), pieza.getCodigo(), proyecto.getCodigo()) < proyectos.size()) {
-                                if (!CargarDatos.gestionProvPiezProyExiste(prov.getCodigo(), pieza.getCodigo(), proyecto.getCodigo())) {
-                                    proyectosNuevaGestion.add(proyecto);
-                                    modelo.addElement(proyecto.getCodigo());
-                                }
-                            }
-                        }
-                        cb_gestProyecto.setModel(modelo);
-                        if (modelo.getSize() > 0) {
-                            cb_gestProyecto.setSelectedIndex(0);
-                            t_gesCantidad.setText("1");
-                        } else {
-                            t_gesNomProyecto.setText("");
-                            t_gesCiudadProyecto.setText("");
-                        }
-                        gestionCargarDatosPieza();
-                    }
-                }
-            }
-        });
-        cb_gestProyecto.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (!insertando)
-                    gestionCargarDatosProyecto();
-                else {
-                    ProyectosEntity proyecto = null;
-                    try {
-                        proyecto = proyectosNuevaGestion.get(cb_gestProyecto.getSelectedIndex());
-                        gestionCargarDatosProyecto();
-                    } catch (NullPointerException | IllegalArgumentException ignored) {}
-                }
-            }
-        });
-
-        recargarDatosVentanaAdminGestion();
-        System.out.println("  Ventana cargada\n");
-    }
+    // Utilidades Gestión
+    // Ventana administrar gestión
     public boolean gestionInsertarNuevaGestion() {
         boolean insertado = false;
         if (gestionComprobarCantidadCorrecta()) {
@@ -1106,12 +797,39 @@ public class VentanaPrincipal {
             } else {
                 mostrarJOptionPane("Error al insertar", "Ha ocurrido un error al elegir los componentes de la nueva gestión", 0);
             }
-
         }
         return insertado;
     }
-    public void gestionEditarGestion() {
+    public boolean gestionEditarGestion() {
+        boolean editado = false;
+        if (gestionComprobarCantidadCorrecta()) {
+            ProveedoresEntity prov = null;
+            PiezasEntity pieza = null;
+            ProyectosEntity proyecto = null;
+            double cantidad = -1;
 
+            try {
+                prov = gestProveedores.get(cb_gestProveedor.getSelectedIndex());
+                pieza = gestPiezas.get(cb_gestPieza.getSelectedIndex());
+                proyecto = gestProyectos.get(cb_gestProyecto.getSelectedIndex());
+                cantidad = Double.parseDouble(t_gesCantidad.getText().replace(',','.'));
+            } catch (NullPointerException | IllegalArgumentException ignored) {}
+
+            if (prov != null && pieza != null && proyecto != null) {
+                if (cantidad >= 0) {
+                    editado = InsertarEditarDatos.saveUpdateGestion(prov, pieza, proyecto, cantidad, 2);
+                }
+            } else {
+                mostrarJOptionPane("Error al insertar", "Ha ocurrido un error al elegir los componentes de la gestión", 0);
+            }
+        }
+        return editado;
+    }
+    public void eliminarGestion(String codProv, String codPieza, String codProyecto) {
+        boolean eliminado = BorrarDatos.eliminarGestion(codProv, codPieza, codProyecto);
+        if (eliminado) {
+            recargarDatosVentanaAdminGestion();
+        }
     }
     public boolean gestionComprobarCantidadCorrecta() {
         if (t_gesCantidad.getText().equalsIgnoreCase("")) {
@@ -1250,12 +968,6 @@ public class VentanaPrincipal {
         cb_gestProveedor.setSelectedIndex(0);
 
     }
-    public void eliminarGestion(String codProv, String codPieza, String codProyecto) {
-        boolean eliminado = BorrarDatos.eliminarGestion(codProv, codPieza, codProyecto);
-        if (eliminado) {
-            recargarDatosVentanaAdminGestion();
-        }
-    }
     public void gestionVaciarDatos() {
         cb_gestProveedor.setModel(new DefaultComboBoxModel<String>());
         cb_gestPieza.setModel(new DefaultComboBoxModel<String>());
@@ -1384,6 +1096,382 @@ public class VentanaPrincipal {
         }
         cb_gestProyecto.setModel(modelo);
     }
+
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Cargar Ventanas
+    // INICIO
+    public void cargarVentanaInicio(int numGif) {
+        try {
+            panelDatos.removeAll();
+            panelDatos.repaint();
+        } catch (Exception ignored) { }
+
+        panelDatos.setLayout(null);
+        confPanel(panelDatos);
+
+        JLabel foto = new JLabel();
+        panelDatos.add(foto);
+        foto.setBounds(0, 0, dimPanelDatos.width, dimPanelDatos.height);
+
+        String gif;
+        if (numGif == 2) {
+            gif = "./assets/2-tostada.gif";
+        } else {
+            gif = "./assets/1-cohete.gif";
+        }
+
+        foto.setIcon(new ImageIcon(gif));
+    }
+
+    // ADMINISTRACIÓN GESTIÓN
+    public void cargarVentanaAdministracionGestion() {
+        System.out.println("  Cargando ventana");
+        insertando = false;
+        try {
+            panelDatos.removeAll();
+            panelDatos.repaint();
+        } catch (Exception ignored) { }
+
+        panelDatos.setLayout(null);
+        confPanel(panelDatos);
+
+        // BOTONES EN EL TOP
+        nuevaGestion = new JButton("Nueva Gestión");
+        confBoton(nuevaGestion, dimBoton);
+        panelDatos.add(nuevaGestion);
+        nuevaGestion.setBounds(15, 20, dimBoton.width + 10, dimBoton.height);
+
+        editarGestion = new JButton("Editar Gestión");
+        confBoton(editarGestion, dimBoton);
+        panelDatos.add(editarGestion);
+        editarGestion.setBounds(185, 20, dimBoton.width + 10, dimBoton.height);
+
+        borrarGestion = new JButton("Borrar Gestión");
+        confBoton(borrarGestion, dimBoton);
+        panelDatos.add(borrarGestion);
+        borrarGestion.setBounds(355, 20, dimBoton.width + 10, dimBoton.height);
+
+        listarGestiones = new JButton("Listar Gestiones");
+        confBoton(listarGestiones, dimBoton);
+        panelDatos.add(listarGestiones);
+        listarGestiones.setBounds(525, 20, dimBoton.width + 10, dimBoton.height);
+
+        // LINEA
+        JPanel linea = new JPanel();
+        linea.setLayout(null);
+        linea.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        panelDatos.add(linea);
+        linea.setBounds(0, 70, dimPanelDatos.width, 1);
+
+
+        // Utilizaremos otro panel donde cargamos la ventana normal que sustituiremos por el listado cada vez que cliquemos en el botón
+        cargarVentanaAdministracionGestionNormal();
+
+        // LISTENERS
+        nuevaGestion.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                editarGestion.setText("Insertar");
+                editarGestion.setEnabled(true);
+                borrarGestion.setText("Cancelar");
+                borrarGestion.setEnabled(true);
+                nuevaGestion.setEnabled(false);
+                listarGestiones.setEnabled(false);
+
+                gestionPrepararNuevaGestion();
+
+            }
+        });
+        editarGestion.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (editarGestion.getText().equalsIgnoreCase("Insertar")) {
+                    if (gestionInsertarNuevaGestion())
+                        reanudarVentanaAdminGestion();
+                } else {
+                    if (gestionEditarGestion())
+                        reanudarVentanaAdminGestion();
+                }
+            }
+        });
+        borrarGestion.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (borrarGestion.getText().equalsIgnoreCase("Cancelar")) {
+                    reanudarVentanaAdminGestion();
+                } else {
+                    try {
+                        ProveedoresEntity prov = gestProveedores.get(cb_gestProveedor.getSelectedIndex());
+                        PiezasEntity pieza = gestPiezas.get(cb_gestPieza.getSelectedIndex());
+                        ProyectosEntity proyecto = gestProyectos.get(cb_gestProyecto.getSelectedIndex());
+                        mostrarJOptionPaneEliminar(4, prov.getCodigo(), pieza.getCodigo(), proyecto.getCodigo());
+                    } catch (NullPointerException | ObjectNotFoundException | IllegalArgumentException ignored) {}
+                }
+            }
+        });
+        listarGestiones.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (listarGestiones.getText().equalsIgnoreCase("Volver")) {
+                    cargarVentanaAdministracionGestionNormal();
+                    listarGestiones.setText("Listar Gestiones");
+                    nuevaGestion.setEnabled(true);
+                    editarGestion.setEnabled(true);
+                    borrarGestion.setEnabled(true);
+                    cargarVentanaAdministracionGestion();
+                } else {
+                    cargarVentanaAdministracionGestionListado();
+                    listarGestiones.setText("Volver");
+                    nuevaGestion.setEnabled(false);
+                    editarGestion.setEnabled(false);
+                    borrarGestion.setEnabled(false);
+                }
+            }
+        });
+        cb_gestProveedor.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!insertando)
+                    gestionCargarDatosProveedor();
+                else {
+                    // CON LAS PIEZAS HACER UN METODO QUE RECOGA EL NUMERO DE COD PROV + COD PIEZA Y MIRE
+                    // IF TOTALPIEZAPROV >= NUMPROYECTOS
+                    ProveedoresEntity prov = null;
+                    try {
+                        prov = proveedoresNuevaGestion.get(cb_gestProveedor.getSelectedIndex());
+                    } catch (NullPointerException | IllegalArgumentException ignored) {}
+                    if (prov != null) {
+                        DefaultComboBoxModel<String> modelo = new DefaultComboBoxModel<>();
+                        piezasNuevaGestion = new ArrayList<>();
+                        piezas = CargarDatos.piezas();
+                        for (PiezasEntity pieza : piezas) {
+                            if (CargarDatos.cargarNumProvPiezaGestion(prov.getCodigo(), pieza.getCodigo()) < CargarDatos.cargarNumProyectos()) {
+                                piezasNuevaGestion.add(pieza);
+                                modelo.addElement(pieza.getCodigo());
+                            }
+                        }
+                        cb_gestPieza.setModel(modelo);
+                        if (modelo.getSize() > 0)
+                            cb_gestPieza.setSelectedIndex(0);
+                        else {
+                            t_gesNomPieza.setText("");
+                            t_gesPrecioPieza.setText("");
+                            t_gesNomProyecto.setText("");
+                            t_gesCiudadProyecto.setText("");
+                        }
+                        gestionCargarDatosProveedor();
+                    }
+                }
+            }
+        });
+        cb_gestPieza.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!insertando)
+                    gestionCargarDatosPieza();
+                else {
+                    PiezasEntity pieza = null;
+                    ProveedoresEntity prov = null;
+                    try {
+                        prov = proveedoresNuevaGestion.get(cb_gestProveedor.getSelectedIndex());
+                        pieza = piezasNuevaGestion.get(cb_gestPieza.getSelectedIndex());
+                    } catch (NullPointerException | IllegalArgumentException ignored) {}
+                    if (pieza != null && prov != null) {
+                        DefaultComboBoxModel<String> modelo = new DefaultComboBoxModel<>();
+                        proyectosNuevaGestion = new ArrayList<>();
+                        proyectos = CargarDatos.proyectos();
+                        for (ProyectosEntity proyecto: proyectos) {
+                            if (CargarDatos.cargarNumProvPiezaProyGestion(prov.getCodigo(), pieza.getCodigo(), proyecto.getCodigo()) < proyectos.size()) {
+                                if (!CargarDatos.gestionProvPiezProyExiste(prov.getCodigo(), pieza.getCodigo(), proyecto.getCodigo())) {
+                                    proyectosNuevaGestion.add(proyecto);
+                                    modelo.addElement(proyecto.getCodigo());
+                                }
+                            }
+                        }
+                        cb_gestProyecto.setModel(modelo);
+                        if (modelo.getSize() > 0) {
+                            cb_gestProyecto.setSelectedIndex(0);
+                            t_gesCantidad.setText("1");
+                        } else {
+                            t_gesNomProyecto.setText("");
+                            t_gesCiudadProyecto.setText("");
+                        }
+                        gestionCargarDatosPieza();
+                    }
+                }
+            }
+        });
+        cb_gestProyecto.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!insertando)
+                    gestionCargarDatosProyecto();
+                else {
+                    ProyectosEntity proyecto = null;
+                    try {
+                        proyecto = proyectosNuevaGestion.get(cb_gestProyecto.getSelectedIndex());
+                        gestionCargarDatosProyecto();
+                    } catch (NullPointerException | IllegalArgumentException ignored) {}
+                }
+            }
+        });
+
+        recargarDatosVentanaAdminGestion();
+        System.out.println("  Ventana cargada\n");
+    }
+    public void cargarVentanaAdministracionGestionNormal() {
+        int anchuraLabel = 80;
+        int anchuraComboBox = 120;
+        int posYPanel = 100;
+
+        try {
+            gesPanel.removeAll();
+            gesPanel.repaint();
+            panelDatos.remove(gesPanel);
+        } catch (Exception ignored) { }
+        gesPanel = new JPanel();
+        gesPanel.setLayout(null);
+        confPanel(gesPanel);
+        panelDatos.add(gesPanel);
+        gesPanel.setBounds(0, posYPanel, dimPanelDatos.width, dimPanelDatos.height - posYPanel);
+
+        // PROVEEDOR
+        JLabel l_proveedor = new JLabel("Proveedor", SwingConstants.RIGHT);
+        confLabel(l_proveedor);
+        gesPanel.add(l_proveedor);
+        l_proveedor.setBounds(15, (110 - posYPanel), anchuraLabel, dimLabel.height);
+
+        cb_gestProveedor = new JComboBox<String>();
+        gesPanel.add(cb_gestProveedor);
+        cb_gestProveedor.setBounds((15 + anchuraLabel + 10), (108 - posYPanel), anchuraComboBox, dimTextField.height);
+        cb_gestProveedor.addItem("Proveedores");
+
+        t_gesNomProveedor = new JTextField();
+        gesPanel.add(t_gesNomProveedor);
+        t_gesNomProveedor.setBounds((15 + anchuraLabel + 10 + anchuraComboBox + 10),
+                (108 - posYPanel), (650 - (15 + anchuraLabel + 10 + anchuraComboBox + 10)), dimTextField.height);
+        t_gesNomProveedor.setEditable(false);
+
+        t_gesDirProveedor = new JTextField();
+        gesPanel.add(t_gesDirProveedor);
+        t_gesDirProveedor.setBounds((15 + anchuraLabel + 10 + anchuraComboBox + 10),
+                (140 - posYPanel), (650 - (15 + anchuraLabel + 10 + anchuraComboBox + 10)), dimTextField.height);
+        t_gesDirProveedor.setEditable(false);
+
+        // PIEZA
+        JLabel l_pieza = new JLabel("Pieza", SwingConstants.RIGHT);
+        confLabel(l_pieza);
+        gesPanel.add(l_pieza);
+        l_pieza.setBounds(15, (210 - posYPanel), anchuraLabel, dimLabel.height);
+
+        cb_gestPieza = new JComboBox<String>();
+        gesPanel.add(cb_gestPieza);
+        cb_gestPieza.setBounds((15 + anchuraLabel + 10), (208 - posYPanel), anchuraComboBox, dimTextField.height);
+        cb_gestPieza.addItem("Piezas");
+
+        t_gesNomPieza = new JTextField();
+        gesPanel.add(t_gesNomPieza);
+        t_gesNomPieza.setBounds((15 + anchuraLabel + 10 + anchuraComboBox + 10),
+                (208 - posYPanel), (650 - (15 + anchuraLabel + 10 + anchuraComboBox + 10)), dimTextField.height);
+        t_gesNomPieza.setEditable(false);
+
+        t_gesPrecioPieza = new JTextField();
+        gesPanel.add(t_gesPrecioPieza);
+        t_gesPrecioPieza.setBounds((15 + anchuraLabel + 10 + anchuraComboBox + 10),
+                (240 - posYPanel), 100, dimTextField.height);
+        t_gesPrecioPieza.setEditable(false);
+
+        // PROYECTO
+        JLabel l_proyecto = new JLabel("Proyecto", SwingConstants.RIGHT);
+        confLabel(l_proyecto);
+        gesPanel.add(l_proyecto);
+        l_proyecto.setBounds(15, (310 - posYPanel), anchuraLabel, dimLabel.height);
+
+        cb_gestProyecto = new JComboBox<String>();
+        gesPanel.add(cb_gestProyecto);
+        cb_gestProyecto.setBounds((15 + anchuraLabel + 10), (308 - posYPanel), anchuraComboBox, dimTextField.height);
+        cb_gestProyecto.addItem("Proyectos");
+
+        t_gesNomProyecto = new JTextField();
+        gesPanel.add(t_gesNomProyecto);
+        t_gesNomProyecto.setBounds((15 + anchuraLabel + 10 + anchuraComboBox + 10),
+                (308 - posYPanel), (650 - (15 + anchuraLabel + 10 + anchuraComboBox + 10)), dimTextField.height);
+        t_gesNomProyecto.setEditable(false);
+
+        t_gesCiudadProyecto = new JTextField();
+        gesPanel.add(t_gesCiudadProyecto);
+        t_gesCiudadProyecto.setBounds((15 + anchuraLabel + 10 + anchuraComboBox + 10),
+                (340 - posYPanel), (650 - (15 + anchuraLabel + 10 + anchuraComboBox + 10)), dimTextField.height);
+        t_gesCiudadProyecto.setEditable(false);
+
+        // CANTIDAD
+        JLabel l_cantidad = new JLabel("Cantidad", SwingConstants.RIGHT);
+        confLabel(l_cantidad);
+        gesPanel.add(l_cantidad);
+        l_cantidad.setBounds(15, (410 - posYPanel), anchuraLabel, dimLabel.height);
+
+        t_gesCantidad = new JTextField();
+        gesPanel.add(t_gesCantidad);
+        t_gesCantidad.setBounds((15 + anchuraLabel + 10), (408 - posYPanel), anchuraComboBox, dimTextField.height);
+        //t_gesCantidad.setEditable(false);
+    }
+    public void cargarVentanaAdministracionGestionListado() {
+        int posYPanel = 72;
+
+        try {
+            gesPanel.removeAll();
+            gesPanel.repaint();
+            panelDatos.remove(gesPanel);
+        } catch (Exception ignored) { }
+        gesPanel = new JPanel();
+        gesPanel.setLayout(null);
+        confPanel(gesPanel);
+        panelDatos.add(gesPanel);
+
+        gesPanel.setBounds(0, posYPanel, dimPanelDatos.width, dimPanelDatos.height - posYPanel);
+
+        gestiones = CargarDatos.gestiones();
+
+        JTable tablaListadoGestiones = new JTable() {
+            public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
+                Component returnComp = super.prepareRenderer(renderer, row, column);
+                Color alternateColor = new Color(0xd4d4d4);
+                Color whiteColor = Color.WHITE;
+                if (!returnComp.getBackground().equals(getSelectionBackground())) {
+                    Color bg = (row % 2 == 0 ? alternateColor : whiteColor);
+                    returnComp.setBackground(bg);
+                    bg = null;
+                }
+                return returnComp;
+            }
+        };
+
+        ModeloListadoGestiones mlg = new ModeloListadoGestiones(gestiones);
+        tablaListadoGestiones.setModel(mlg);
+        //tablaListadoGestiones.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        //gesPanel.add(tablaListadoGestiones);
+        //tablaListadoGestiones.setBounds(0, 0, dimPanelDatos.width, (dimPanelDatos.height - posYPanel));
+
+        JScrollPane scrollPane = new JScrollPane(tablaListadoGestiones);
+        gesPanel.add(scrollPane);
+        scrollPane.setBounds(1, 0, dimPanelDatos.width - 1, dimPanelDatos.height - posYPanel);
+        int[] widthsListadoGestiones = { 200, 200, 200, dimPanelDatos.width - 1 };
+        resizeColumnWidth(tablaListadoGestiones, widthsListadoGestiones);
+    }
+    public void resizeColumnWidth(JTable table, int[] widths) {
+        final TableColumnModel columnModel = table.getColumnModel();
+        for (int column = 0; column < table.getColumnCount(); column++) {
+            int width = widths[column];
+            if (column == 3)
+                for (int i = 0; i < widths.length - 1; i++) {
+                    width -= widths[i];
+                }
+            columnModel.getColumn(column).setPreferredWidth(width);
+        }
+    }
+
 
     // PIEZA
     public void cargarVentanaPiezaGestion() {
