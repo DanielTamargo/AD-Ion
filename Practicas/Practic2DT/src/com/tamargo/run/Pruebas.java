@@ -6,9 +6,11 @@ public class Pruebas {
 
     public static void main(String[] args) {
 
-        String[] probando = CargarDatos.cargarDatosPiezaMasVecesDistintasSuministrada();
+        float[] probando = CargarDatos.piezaDatosListadoEstadisticas("G00002");
 
-        System.out.println(probando[0] + " | " + probando[1]);
+        for (float v : probando) {
+            System.out.println(v);
+        }
     }
 
 }

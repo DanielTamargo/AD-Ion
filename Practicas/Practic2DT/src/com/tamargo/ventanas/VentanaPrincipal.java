@@ -4,6 +4,8 @@ import com.tamargo.GestionEntity;
 import com.tamargo.PiezasEntity;
 import com.tamargo.ProveedoresEntity;
 import com.tamargo.ProyectosEntity;
+import com.tamargo.tablas.ModeloListadoEstPiezas;
+import com.tamargo.tablas.ModeloListadoEstProveedores;
 import com.tamargo.tablas.ModeloListadoGestiones;
 import com.tamargo.util.BorrarDatos;
 import com.tamargo.util.CargarDatos;
@@ -31,7 +33,6 @@ public class VentanaPrincipal {
     private JFrame ventanaPrincipal;
     private JPanel panel;
     private JPanel panelDatos;
-
     private int numVentana = 1;
 
     // ArrayLists con los datos
@@ -118,6 +119,8 @@ public class VentanaPrincipal {
     private JTextField t_sumProvNumPiez;
     private JTextField t_sumProvNumProy;
     private JButton b_sumProvPiezasSuministradas;
+    private JCheckBox check_sumProv;
+    private boolean checkSumProvMarcado = false;
 
     // Suministros Piezas
     private JComboBox<String> cb_sumPza;
@@ -128,23 +131,25 @@ public class VentanaPrincipal {
     private JTextField t_sumPzaNumProv;
     private JTextField t_sumPzaTotal;
     private JButton b_sumPzaPiezasSuministradas;
+    private JCheckBox check_sumPza;
+    private boolean checkSumPzaMarcado = false;
 
     // Estadísticas
-    JButton b_estNumPiezasProyecto;
-    JTextField t_estCodPiezaMasCantidad;
-    JTextField t_estNombrePiezaMasCantidad;
-    JTextField t_estCodPiezaMasProyectos;
-    JTextField t_estNombrePiezaMasProyectos;
+    private JButton b_estNumPiezasProyecto;
+    private JTextField t_estCodPiezaMasCantidad;
+    private JTextField t_estNombrePiezaMasCantidad;
+    private JTextField t_estCodPiezaMasProyectos;
+    private JTextField t_estNombrePiezaMasProyectos;
 
-    JButton b_estNumPiezasProveedor;
-    JTextField t_estCodProvMasCantPiezas;
-    JTextField t_estNombreProvMasCantPiezas;
-    JTextField t_estCodProvMasProy;
-    JTextField t_estNombreProvMasProy;
-    JTextField t_estCodProvMasPiezasDistintas;
-    JTextField t_estNombreProvMasPiezasDistintas;
+    private JButton b_estNumPiezasProveedor;
+    private JTextField t_estCodProvMasCantPiezas;
+    private JTextField t_estNombreProvMasCantPiezas;
+    private JTextField t_estCodProvMasProy;
+    private JTextField t_estNombreProvMasProy;
+    private JTextField t_estCodProvMasPiezasDistintas;
+    private JTextField t_estNombreProvMasPiezasDistintas;
 
-
+    private boolean filtrarEstadisticas = true;
 
     // Dimensiones
     private final Dimension dimPanelDatos = new Dimension(700, 500);
@@ -160,10 +165,6 @@ public class VentanaPrincipal {
     public VentanaPrincipal() {
         cargarVentanaInicio(1);
     }
-
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Métodos iniciales
-
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Métodos generales
@@ -271,7 +272,7 @@ public class VentanaPrincipal {
         final TableColumnModel columnModel = table.getColumnModel();
         for (int column = 0; column < table.getColumnCount(); column++) {
             int width = widths[column];
-            if (column == 3)
+            if (column == table.getColumnCount() - 1)
                 for (int i = 0; i < widths.length - 1; i++) {
                     width -= widths[i];
                 }
@@ -280,7 +281,7 @@ public class VentanaPrincipal {
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Cargar Datos
+    // Administración de Proveedores, Piezas y Proyectos: Cargar Listas
     public void cargarListaProveedores() {
         DefaultListModel<ProveedoresEntity> modelo = new DefaultListModel<>();
 
@@ -1144,6 +1145,79 @@ public class VentanaPrincipal {
         cb_gestProyecto.setModel(modelo);
     }
 
+    // Ventana suministros
+    public void cargarDatosSuministrosProveedor() {
+        ProveedoresEntity proveedor = null;
+        try {
+            proveedor = proveedores.get(cb_sumProv.getSelectedIndex());
+        } catch (NullPointerException | IllegalArgumentException | ClassCastException | ObjectNotFoundException ignored) {}
+        if (proveedor != null) {
+            float[] datosProveedor = CargarDatos.proveedorDatosListadoEstadisticas(proveedor.getCodigo());
+            t_sumProvNom.setText(proveedor.getNombre());
+            t_sumProvApe.setText(proveedor.getApellidos());
+            t_sumProvDir.setText(proveedor.getDireccion());
+
+            t_sumProvNumPiez.setText(String.format("%.0f", datosProveedor[0]));
+            t_sumProvNumProy.setText(String.format("%.0f", datosProveedor[2]));
+        }
+    }
+    public void vaciarDatosSuministrosProveedor() {
+        t_sumProvNom.setText("");
+        t_sumProvApe.setText("");
+        t_sumProvDir.setText("");
+
+        t_sumProvNumPiez.setText("");
+        t_sumProvNumProy.setText("");
+    }
+    public void cargarDatosSuministrosPieza() {
+        PiezasEntity pieza = null;
+        try {
+            pieza = piezas.get(cb_sumPza.getSelectedIndex());
+        } catch (NullPointerException | IllegalArgumentException | ClassCastException | ObjectNotFoundException ignored) {}
+        if (pieza != null) {
+            float[] datosPieza = CargarDatos.piezaDatosListadoEstadisticas(pieza.getCodigo());
+            t_sumPzaNom.setText(pieza.getNombre());
+            t_sumPzaDesc.setText(pieza.getDescripcion());
+            t_sumPzaPrecio.setText(String.format("%.2f", pieza.getPrecio()));
+
+            t_sumPzaNumProv.setText(String.format("%.0f", datosPieza[0]));
+            t_sumPzaTotal.setText(String.format("%.0f", datosPieza[1]));
+            t_sumPzaNumProy.setText(String.format("%.0f", datosPieza[2]));
+        }
+    }
+    public void vaciarDatosSuministrosPieza() {
+        t_sumPzaNom.setText("");
+        t_sumPzaDesc.setText("");
+        t_sumPzaPrecio.setText("");
+
+        t_sumPzaNumProv.setText("");
+        t_sumPzaTotal.setText("");
+        t_sumPzaNumProy.setText("");
+    }
+    public void cargarModeloCheckBoxSuministrosProveedor(ArrayList<ProveedoresEntity> proveedores) {
+        DefaultComboBoxModel<String> modelo = new DefaultComboBoxModel<>();
+        for (ProveedoresEntity prov : proveedores) {
+            modelo.addElement(prov.getCodigo());
+        }
+        cb_sumProv.setModel(modelo);
+        if (proveedores.size() > 0)
+            cb_sumProv.setSelectedIndex(0);
+        else
+            vaciarDatosSuministrosProveedor();
+    }
+    public void cargarModeloCheckBoxSuministrosPieza(ArrayList<PiezasEntity> piezas) {
+        DefaultComboBoxModel<String> modelo = new DefaultComboBoxModel<>();
+        for (PiezasEntity pieza : piezas) {
+            modelo.addElement(pieza.getCodigo());
+        }
+        cb_sumPza.setModel(modelo);
+        if (piezas.size() > 0)
+            cb_sumPza.setSelectedIndex(0);
+        else
+            vaciarDatosSuministrosPieza();
+    }
+
+    // Ventana estadísticas
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1174,6 +1248,7 @@ public class VentanaPrincipal {
 
     // ADMINISTRACIÓN GESTIÓN
     public void cargarVentanaAdministracionGestion() {
+        System.out.println("Gestión: Administración");
         System.out.println("  Cargando ventana");
         insertando = false;
         try {
@@ -1267,9 +1342,13 @@ public class VentanaPrincipal {
                     nuevaGestion.setEnabled(true);
                     editarGestion.setEnabled(true);
                     borrarGestion.setEnabled(true);
+                    System.out.println("  Cargando Administración de Gestiones");
                     cargarVentanaAdministracionGestion();
+                    System.out.println("  Ventana cargada\n");
                 } else {
+                    System.out.println("  Cargando Listado de Gestiones");
                     cargarVentanaAdministracionGestionListado();
+                    System.out.println("  Listado Cargado\n");
                     listarGestiones.setText("Volver");
                     nuevaGestion.setEnabled(false);
                     editarGestion.setEnabled(false);
@@ -1508,197 +1587,21 @@ public class VentanaPrincipal {
         resizeColumnWidth(tablaListadoGestiones, widthsListadoGestiones);
     }
 
-    public void cargarVentanaEstadisticas() {
-        System.out.println("  Cargando datos");
-
-        String[] proveedorConMasPiezasDistintas = CargarDatos.cargarDatosProvConMasPiezasDistintas();
-        String[] proveedorConMasProyectosDistintos = CargarDatos.cargarDatosProvConMasProyectosDistintos();
-        String[] proveedorConMasCantidadPiezas = CargarDatos.cargarDatosProvConMasCantidadPiezas();
-
-        String[] piezaMasCantidadVecesSuministrada = CargarDatos.cargarDatosPiezaMasCantidadVecesSuministrada();
-        String[] piezaMasVecesDistintasSuministrada = CargarDatos.cargarDatosPiezaMasVecesDistintasSuministrada();
-
-        System.out.println("  Datos cargados");
-
-        System.out.println("  Cargando ventana");
-        try {
-            panelDatos.removeAll();
-            panelDatos.repaint();
-        } catch (Exception ignored) { }
-
-        JLabel l_titulo = new JLabel("RESÚMENES ESTADÍSTICOS", SwingConstants.CENTER);
-        l_titulo.setFont(new Font("Arial", Font.BOLD, 25));
-        l_titulo.setForeground(Color.DARK_GRAY);
-        panelDatos.add(l_titulo);
-        l_titulo.setBounds(0, 15, dimPanelDatos.width, dimLabel.height + 10);
-
-        JLabel l_subtitulo = new JLabel("PIEZAS, PROYECTOS Y PROVEEDORES", SwingConstants.CENTER);
-        l_subtitulo.setFont(new Font("Arial", Font.BOLD, 18));
-        l_subtitulo.setForeground(Color.DARK_GRAY);
-        panelDatos.add(l_subtitulo);
-        l_subtitulo.setBounds(0, 42, dimPanelDatos.width, dimLabel.height);
-
-        JPanel lineaSeparadora = new JPanel();
-        lineaSeparadora.setLayout(null);
-        lineaSeparadora.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
-        panelDatos.add(lineaSeparadora);
-        lineaSeparadora.setBounds(0, 75, dimPanelDatos.width, 8);
-        lineaSeparadora.setBackground(Color.DARK_GRAY);
-
-        int margen = 20;
-        int anchuraLabel = 300;
-
-        int posY = 90;
-
-        b_estNumPiezasProyecto = new JButton("Número de piezas y cantidad de piezas suministradas en proyectos");
-        confBoton(b_estNumPiezasProyecto, dimBoton);
-        panelDatos.add(b_estNumPiezasProyecto);
-        b_estNumPiezasProyecto.setBounds(margen, posY, dimPanelDatos.width - (margen * 2), dimBoton.height);
-
-        posY += 50;
-
-        JLabel l_piezaMasCant = new JLabel("Pieza suministrada más cantidad de veces en total:", SwingConstants.LEFT);
-        confLabel(l_piezaMasCant);
-        panelDatos.add(l_piezaMasCant);
-        l_piezaMasCant.setBounds(margen, posY, anchuraLabel, dimLabel.height);
-
-        t_estCodPiezaMasCantidad = new JTextField();
-        panelDatos.add(t_estCodPiezaMasCantidad);
-        t_estCodPiezaMasCantidad.setBounds(margen + anchuraLabel, posY - 2, 55, dimTextField.height);
-        t_estCodPiezaMasCantidad.setEditable(false);
-        t_estCodPiezaMasCantidad.setText(piezaMasCantidadVecesSuministrada[0]);
-        t_estCodPiezaMasCantidad.setHorizontalAlignment(SwingConstants.CENTER);
-
-        t_estNombrePiezaMasCantidad = new JTextField();
-        panelDatos.add(t_estNombrePiezaMasCantidad);
-        t_estNombrePiezaMasCantidad.setBounds(margen + anchuraLabel + 55 + 10, posY - 2, dimPanelDatos.width - (margen + anchuraLabel + 10 + 55 + 20), dimTextField.height);
-        t_estNombrePiezaMasCantidad.setEditable(false);
-        t_estNombrePiezaMasCantidad.setText(piezaMasCantidadVecesSuministrada[1]);
-
-        posY += 30;
-
-        JLabel l_piezaMasProy = new JLabel("Pieza suministrada a más proyectos distintos:", SwingConstants.LEFT);
-        confLabel(l_piezaMasProy);
-        panelDatos.add(l_piezaMasProy);
-        l_piezaMasProy.setBounds(margen, posY, anchuraLabel, dimLabel.height);
-
-        t_estCodPiezaMasProyectos = new JTextField();
-        panelDatos.add(t_estCodPiezaMasProyectos);
-        t_estCodPiezaMasProyectos.setBounds(margen + anchuraLabel, posY - 2, 55, dimTextField.height);
-        t_estCodPiezaMasProyectos.setEditable(false);
-        t_estCodPiezaMasProyectos.setText(piezaMasVecesDistintasSuministrada[0]);
-        t_estCodPiezaMasProyectos.setHorizontalAlignment(SwingConstants.CENTER);
-
-        t_estNombrePiezaMasProyectos = new JTextField();
-        panelDatos.add(t_estNombrePiezaMasProyectos);
-        t_estNombrePiezaMasProyectos.setBounds(margen + anchuraLabel + 55 + 10, posY - 2, dimPanelDatos.width - (margen + anchuraLabel + 10 + 55 + 20), dimTextField.height);
-        t_estNombrePiezaMasProyectos.setEditable(false);
-        t_estNombrePiezaMasProyectos.setText(piezaMasVecesDistintasSuministrada[1]);
-
-        posY += 30;
-
-        JPanel lineaSeparadora2 = new JPanel();
-        lineaSeparadora2.setLayout(null);
-        lineaSeparadora2.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
-        panelDatos.add(lineaSeparadora2);
-        lineaSeparadora2.setBounds(0, posY, dimPanelDatos.width, 8);
-        lineaSeparadora2.setBackground(Color.DARK_GRAY);
-
-        posY += 15;
-
-        b_estNumPiezasProveedor = new JButton("Número de piezas y cantidad de piezas suministradas por proveedor");
-        confBoton(b_estNumPiezasProveedor, dimBoton);
-        panelDatos.add(b_estNumPiezasProveedor);
-        b_estNumPiezasProveedor.setBounds(margen, posY, dimPanelDatos.width - (margen * 2), dimBoton.height);
-
-        posY += 55;
-        anchuraLabel = 330;
-
-        JLabel l_provMasCant = new JLabel("Proveedor que ha suministrado más cantidad de piezas:", SwingConstants.LEFT);
-        confLabel(l_provMasCant);
-        panelDatos.add(l_provMasCant);
-        l_provMasCant.setBounds(margen, posY, anchuraLabel, dimLabel.height);
-
-        t_estCodProvMasCantPiezas = new JTextField();
-        panelDatos.add(t_estCodProvMasCantPiezas);
-        t_estCodProvMasCantPiezas.setBounds(margen + anchuraLabel, posY - 2, 55, dimTextField.height);
-        t_estCodProvMasCantPiezas.setEditable(false);
-        t_estCodProvMasCantPiezas.setText(proveedorConMasCantidadPiezas[0]);
-        t_estCodProvMasCantPiezas.setHorizontalAlignment(SwingConstants.CENTER);
-
-        t_estNombreProvMasCantPiezas = new JTextField();
-        panelDatos.add(t_estNombreProvMasCantPiezas);
-        t_estNombreProvMasCantPiezas.setBounds(margen + anchuraLabel + 55 + 10, posY - 2, dimPanelDatos.width - (margen + anchuraLabel + 10 + 55 + 20), dimTextField.height);
-        t_estNombreProvMasCantPiezas.setEditable(false);
-        t_estNombreProvMasCantPiezas.setText(proveedorConMasCantidadPiezas[1]);
-
-        posY += 30;
-
-        JLabel l_provMasProy = new JLabel("Proveedor que ha participado en distintos proyectos:", SwingConstants.LEFT);
-        confLabel(l_provMasProy);
-        panelDatos.add(l_provMasProy);
-        l_provMasProy.setBounds(margen, posY, anchuraLabel, dimLabel.height);
-
-        t_estCodProvMasProy = new JTextField();
-        panelDatos.add(t_estCodProvMasProy);
-        t_estCodProvMasProy.setBounds(margen + anchuraLabel, posY - 2, 55, dimTextField.height);
-        t_estCodProvMasProy.setEditable(false);
-        t_estCodProvMasProy.setText(proveedorConMasProyectosDistintos[0]);
-        t_estCodProvMasProy.setHorizontalAlignment(SwingConstants.CENTER);
-
-        t_estNombreProvMasProy = new JTextField();
-        panelDatos.add(t_estNombreProvMasProy);
-        t_estNombreProvMasProy.setBounds(margen + anchuraLabel + 55 + 10, posY - 2, dimPanelDatos.width - (margen + anchuraLabel + 10 + 55 + 20), dimTextField.height);
-        t_estNombreProvMasProy.setEditable(false);
-        t_estNombreProvMasProy.setText(proveedorConMasProyectosDistintos[1]);
-
-        posY += 30;
-
-        JLabel l_provMasPiezasDistintas = new JLabel("Proveedor que ha suministrado más piezas distintas:", SwingConstants.LEFT);
-        confLabel(l_provMasPiezasDistintas);
-        panelDatos.add(l_provMasPiezasDistintas);
-        l_provMasPiezasDistintas.setBounds(margen, posY, anchuraLabel, dimLabel.height);
-
-        t_estCodProvMasPiezasDistintas = new JTextField();
-        panelDatos.add(t_estCodProvMasPiezasDistintas);
-        t_estCodProvMasPiezasDistintas.setBounds(margen + anchuraLabel, posY - 2, 55, dimTextField.height);
-        t_estCodProvMasPiezasDistintas.setEditable(false);
-        t_estCodProvMasPiezasDistintas.setText(proveedorConMasPiezasDistintas[0]);
-        t_estCodProvMasPiezasDistintas.setHorizontalAlignment(SwingConstants.CENTER);
-
-        t_estNombreProvMasPiezasDistintas = new JTextField();
-        panelDatos.add(t_estNombreProvMasPiezasDistintas);
-        t_estNombreProvMasPiezasDistintas.setBounds(margen + anchuraLabel + 55 + 10, posY - 2, dimPanelDatos.width - (margen + anchuraLabel + 10 + 55 + 20), dimTextField.height);
-        t_estNombreProvMasPiezasDistintas.setEditable(false);
-        t_estNombreProvMasPiezasDistintas.setText(proveedorConMasPiezasDistintas[1]);
-
-        posY += 50;
-
-        JLabel piePagina = new JLabel("Fin del proyecto", SwingConstants.CENTER);
-        panelDatos.add(piePagina);
-        piePagina.setBounds(0, posY + 40, dimPanelDatos.width, 60);
-        piePagina.setFont(new Font("Calibri", Font.BOLD, 35));
-        piePagina.setForeground(Color.WHITE);
-
-        JPanel fondoPiePagina = new JPanel();
-        fondoPiePagina.setLayout(null);
-        fondoPiePagina.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
-        panelDatos.add(fondoPiePagina);
-        fondoPiePagina.setBounds(0, posY, dimPanelDatos.width, dimPanelDatos.height - posY);
-        fondoPiePagina.setBackground(Color.DARK_GRAY);
-
-        //TODO LISTENERS AMBOS BOTONES
-
-        System.out.println("  Ventana cargada");
-    }
-
+    // SUMINISTROS
     public void cargarVentanaSuministros() {
+        System.out.println("Estadísticas: Suministros");
         System.out.println("  Cargando datos");
-        proveedores = CargarDatos.proveedores();
-        piezas = CargarDatos.piezas();
+        if (checkSumProvMarcado)
+            proveedores = CargarDatos.proveedoresGestion();
+        else
+            proveedores = CargarDatos.proveedores();
+        if (checkSumPzaMarcado)
+            piezas = CargarDatos.piezasGestion();
+        else
+            piezas = CargarDatos.piezas();
         System.out.println("  Datos cargados:\n" +
                 "\tNum.Proveedores: " + proveedores.size() +
-                "\tNum.Piezas: " + piezas.size());
+                "\n\tNum.Piezas: " + piezas.size());
         System.out.println("  Cargando ventana");
         try {
             panelDatos.removeAll();
@@ -1750,10 +1653,26 @@ public class VentanaPrincipal {
         t_sumProvNumProy.setBounds(anchuraLabel + 10, posY + 70 - 2, 80, dimTextField.height);
         t_sumProvNumProy.setEditable(false);
 
-        b_sumProvPiezasSuministradas = new JButton("Ver listado suministros");
+        b_sumProvPiezasSuministradas = new JButton("Ver listado proveedores");
         confBoton(b_sumProvPiezasSuministradas, dimBoton);
         panelDatos.add(b_sumProvPiezasSuministradas);
         b_sumProvPiezasSuministradas.setBounds(10, posY + 100, 222, dimBoton.height);
+
+        JLabel l_provFiltrar1 = new JLabel("Filtrar proveedores por aquellos", SwingConstants.RIGHT);
+        confLabel(l_provFiltrar1);
+        panelDatos.add(l_provFiltrar1);
+        l_provFiltrar1.setBounds(dimPanelDatos.width - 40 - 195, posY - 47, 190, dimLabel.height);
+
+        JLabel l_provFiltrar2 = new JLabel("que participen en gestiones", SwingConstants.RIGHT);
+        confLabel(l_provFiltrar2);
+        panelDatos.add(l_provFiltrar2);
+        l_provFiltrar2.setBounds(dimPanelDatos.width - 40 - 195, posY - 33, 190, dimLabel.height);
+
+        check_sumProv = new JCheckBox();
+        panelDatos.add(check_sumProv);
+        check_sumProv.setBounds(dimPanelDatos.width - 40, posY - 40, 20, 20);
+        if (checkSumProvMarcado)
+            check_sumProv.setSelected(true);
 
         JPanel datosProveedor = new JPanel();
         datosProveedor.setLayout(null);
@@ -1837,20 +1756,36 @@ public class VentanaPrincipal {
         confLabel(l_pzaCantTotal1);
         panelDatos.add(l_pzaCantTotal1);
         l_pzaCantTotal1.setBounds(0, posY + 110 - 7, anchuraLabel, dimLabel.height);
-        JLabel l_pzaCantTotal2 = new JLabel("piezas suministradas", SwingConstants.RIGHT);
+        JLabel l_pzaCantTotal2 = new JLabel("veces suministrada", SwingConstants.RIGHT);
         confLabel(l_pzaCantTotal2);
         panelDatos.add(l_pzaCantTotal2);
         l_pzaCantTotal2.setBounds(0, posY + 110 + 7, anchuraLabel, dimLabel.height);
 
-        t_sumPzaNumProv = new JTextField();
-        panelDatos.add(t_sumPzaNumProv);
-        t_sumPzaNumProv.setBounds(anchuraLabel + 10, posY + 110 - 1, 80, dimTextField.height);
-        t_sumPzaNumProv.setEditable(false);
+        t_sumPzaTotal = new JTextField();
+        panelDatos.add(t_sumPzaTotal);
+        t_sumPzaTotal.setBounds(anchuraLabel + 10, posY + 110 - 1, 80, dimTextField.height);
+        t_sumPzaTotal.setEditable(false);
 
-        b_sumPzaPiezasSuministradas = new JButton("Listado suministros pieza");
+        b_sumPzaPiezasSuministradas = new JButton("Ver listado piezas");
         confBoton(b_sumPzaPiezasSuministradas, dimBoton);
         panelDatos.add(b_sumPzaPiezasSuministradas);
         b_sumPzaPiezasSuministradas.setBounds(10, posY + 150, 222, dimBoton.height);
+
+        JLabel l_pzaFiltrar1 = new JLabel("Filtrar piezas por aquellas", SwingConstants.RIGHT);
+        confLabel(l_pzaFiltrar1);
+        panelDatos.add(l_pzaFiltrar1);
+        l_pzaFiltrar1.setBounds(dimPanelDatos.width - 40 - 195, posY - 47, 190, dimLabel.height);
+
+        JLabel l_pzaFiltrar2 = new JLabel("que participen en gestiones", SwingConstants.RIGHT);
+        confLabel(l_pzaFiltrar2);
+        panelDatos.add(l_pzaFiltrar2);
+        l_pzaFiltrar2.setBounds(dimPanelDatos.width - 40 - 195, posY - 33, 190, dimLabel.height);
+
+        check_sumPza = new JCheckBox();
+        panelDatos.add(check_sumPza);
+        check_sumPza.setBounds(dimPanelDatos.width - 40, posY - 40, 20, 20);
+        if (checkSumPzaMarcado)
+            check_sumPza.setSelected(true);
 
         JPanel datosPieza = new JPanel();
         datosPieza.setLayout(null);
@@ -1876,16 +1811,407 @@ public class VentanaPrincipal {
         t_sumPzaDesc.setOpaque(false);
         t_sumPzaDesc.setBorder(BorderFactory.createLineBorder(new Color(0xadcfdb)));
 
+        cb_sumProv.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cargarDatosSuministrosProveedor();
+            }
+        });
+        cb_sumPza.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cargarDatosSuministrosPieza();
+            }
+        });
+        b_sumProvPiezasSuministradas.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cargarVentanaListadoEstadisticas(2, 1);
+            }
+        });
+        b_sumPzaPiezasSuministradas.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cargarVentanaListadoEstadisticas(1, 1);
+            }
+        });
+        check_sumProv.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!checkSumProvMarcado) {
+                    checkSumProvMarcado = true;
+                    System.out.println("  Filtrando proveedores");
+                    proveedores = CargarDatos.proveedoresGestion();
+                } else {
+                    checkSumProvMarcado = false;
+                    System.out.println("  Quitando el filtro de los proveedores");
+                    proveedores = CargarDatos.proveedores();
+                }
+                cargarModeloCheckBoxSuministrosProveedor(proveedores);
+                System.out.println("  Datos cargados: " + proveedores.size() + "\n");
+            }
+        });
+        check_sumPza.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!checkSumPzaMarcado) {
+                    checkSumPzaMarcado = true;
+                    System.out.println("  Filtrando piezas");
+                    piezas = CargarDatos.piezasGestion();
+                } else {
+                    checkSumPzaMarcado = false;
+                    System.out.println("  Quitando el filtro de las piezas");
+                    piezas = CargarDatos.piezas();
+                }
+                cargarModeloCheckBoxSuministrosPieza(piezas);
+                System.out.println("  Datos cargados: " + piezas.size() + "\n");
+            }
+        });
 
-        // TODO LISTENERS AMBOS CHECK BOX + AMBOS BOTONES LISTADOS
+        cargarModeloCheckBoxSuministrosProveedor(proveedores);
+        cargarModeloCheckBoxSuministrosPieza(piezas);
+
+        System.out.println("   Ventana cargada\n");
+    }
+
+    // ESTADISTICAS
+    public void cargarVentanaEstadisticas() {
+        System.out.println("Estadísticas: Generales");
+        System.out.println("  Cargando datos");
+
+        String[] proveedorConMasPiezasDistintas = CargarDatos.cargarDatosProvConMasPiezasDistintas();
+        String[] proveedorConMasProyectosDistintos = CargarDatos.cargarDatosProvConMasProyectosDistintos();
+        String[] proveedorConMasCantidadPiezas = CargarDatos.cargarDatosProvConMasCantidadPiezas();
+
+        String[] piezaMasCantidadVecesSuministrada = CargarDatos.cargarDatosPiezaMasCantidadVecesSuministrada();
+        String[] piezaMasVecesDistintasSuministrada = CargarDatos.cargarDatosPiezaMasVecesDistintasSuministrada();
+
+        System.out.println("  Todos los datos cargados");
+
+        System.out.println("  Cargando ventana");
+        try {
+            panelDatos.removeAll();
+            panelDatos.repaint();
+        } catch (Exception ignored) { }
+
+        JLabel l_titulo = new JLabel("RESÚMENES ESTADÍSTICOS", SwingConstants.CENTER);
+        l_titulo.setFont(new Font("Arial", Font.BOLD, 25));
+        l_titulo.setForeground(Color.DARK_GRAY);
+        panelDatos.add(l_titulo);
+        l_titulo.setBounds(0, 15, dimPanelDatos.width, dimLabel.height + 10);
+
+        JLabel l_subtitulo = new JLabel("PIEZAS, PROYECTOS Y PROVEEDORES", SwingConstants.CENTER);
+        l_subtitulo.setFont(new Font("Arial", Font.BOLD, 18));
+        l_subtitulo.setForeground(Color.DARK_GRAY);
+        panelDatos.add(l_subtitulo);
+        l_subtitulo.setBounds(0, 42, dimPanelDatos.width, dimLabel.height);
+
+        JPanel lineaSeparadora = new JPanel();
+        lineaSeparadora.setLayout(null);
+        lineaSeparadora.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
+        panelDatos.add(lineaSeparadora);
+        lineaSeparadora.setBounds(0, 75, dimPanelDatos.width, 8);
+        lineaSeparadora.setBackground(Color.DARK_GRAY);
+
+        int margen = 20;
+        int anchuraLabel = 300;
+
+        int posY = 90;
+
+        b_estNumPiezasProyecto = new JButton("Número de piezas y cantidad de piezas suministradas en proyectos");
+        confBoton(b_estNumPiezasProyecto, dimBoton);
+        panelDatos.add(b_estNumPiezasProyecto);
+        b_estNumPiezasProyecto.setBounds(margen, posY, dimPanelDatos.width - (margen * 2), dimBoton.height);
+
+        posY += 50;
+
+        JLabel l_piezaMasCant = new JLabel("Pieza suministrada más cantidad de veces en total:", SwingConstants.LEFT);
+        confLabel(l_piezaMasCant);
+        panelDatos.add(l_piezaMasCant);
+        l_piezaMasCant.setBounds(margen, posY, anchuraLabel, dimLabel.height);
+
+        t_estCodPiezaMasCantidad = new JTextField();
+        panelDatos.add(t_estCodPiezaMasCantidad);
+        t_estCodPiezaMasCantidad.setBounds(margen + anchuraLabel, posY - 2, 55, dimTextField.height);
+        t_estCodPiezaMasCantidad.setEditable(false);
+        t_estCodPiezaMasCantidad.setText(piezaMasCantidadVecesSuministrada[0]);
+        t_estCodPiezaMasCantidad.setHorizontalAlignment(SwingConstants.CENTER);
+
+        t_estNombrePiezaMasCantidad = new JTextField();
+        panelDatos.add(t_estNombrePiezaMasCantidad);
+        t_estNombrePiezaMasCantidad.setBounds(margen + anchuraLabel + 55 + 10, posY - 2, dimPanelDatos.width - (margen + anchuraLabel + 10 + 55 + 20), dimTextField.height);
+        t_estNombrePiezaMasCantidad.setEditable(false);
+        t_estNombrePiezaMasCantidad.setText(piezaMasCantidadVecesSuministrada[1]);
+
+        posY += 30;
+
+        JLabel l_piezaMasProy = new JLabel("Pieza suministrada a más proyectos distintos:", SwingConstants.LEFT);
+        confLabel(l_piezaMasProy);
+        panelDatos.add(l_piezaMasProy);
+        l_piezaMasProy.setBounds(margen, posY, anchuraLabel, dimLabel.height);
+
+        t_estCodPiezaMasProyectos = new JTextField();
+        panelDatos.add(t_estCodPiezaMasProyectos);
+        t_estCodPiezaMasProyectos.setBounds(margen + anchuraLabel, posY - 2, 55, dimTextField.height);
+        t_estCodPiezaMasProyectos.setEditable(false);
+        t_estCodPiezaMasProyectos.setText(piezaMasVecesDistintasSuministrada[0]);
+        t_estCodPiezaMasProyectos.setHorizontalAlignment(SwingConstants.CENTER);
+
+        t_estNombrePiezaMasProyectos = new JTextField();
+        panelDatos.add(t_estNombrePiezaMasProyectos);
+        t_estNombrePiezaMasProyectos.setBounds(margen + anchuraLabel + 55 + 10, posY - 2, dimPanelDatos.width - (margen + anchuraLabel + 10 + 55 + 20), dimTextField.height);
+        t_estNombrePiezaMasProyectos.setEditable(false);
+        t_estNombrePiezaMasProyectos.setText(piezaMasVecesDistintasSuministrada[1]);
+
+        posY += 40;
+
+        JPanel lineaSeparadora2 = new JPanel();
+        lineaSeparadora2.setLayout(null);
+        lineaSeparadora2.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
+        panelDatos.add(lineaSeparadora2);
+        lineaSeparadora2.setBounds(0, posY, dimPanelDatos.width, 8);
+        lineaSeparadora2.setBackground(Color.DARK_GRAY);
+
+        posY += 15;
+
+        b_estNumPiezasProveedor = new JButton("Número de piezas y cantidad de piezas suministradas por proveedor");
+        confBoton(b_estNumPiezasProveedor, dimBoton);
+        panelDatos.add(b_estNumPiezasProveedor);
+        b_estNumPiezasProveedor.setBounds(margen, posY, dimPanelDatos.width - (margen * 2), dimBoton.height);
+
+        posY += 55;
+        anchuraLabel = 330;
+
+        JLabel l_provMasCant = new JLabel("Proveedor que ha suministrado más cantidad de piezas:", SwingConstants.LEFT);
+        confLabel(l_provMasCant);
+        panelDatos.add(l_provMasCant);
+        l_provMasCant.setBounds(margen, posY, anchuraLabel, dimLabel.height);
+
+        t_estCodProvMasCantPiezas = new JTextField();
+        panelDatos.add(t_estCodProvMasCantPiezas);
+        t_estCodProvMasCantPiezas.setBounds(margen + anchuraLabel, posY - 2, 55, dimTextField.height);
+        t_estCodProvMasCantPiezas.setEditable(false);
+        t_estCodProvMasCantPiezas.setText(proveedorConMasCantidadPiezas[0]);
+        t_estCodProvMasCantPiezas.setHorizontalAlignment(SwingConstants.CENTER);
+
+        t_estNombreProvMasCantPiezas = new JTextField();
+        panelDatos.add(t_estNombreProvMasCantPiezas);
+        t_estNombreProvMasCantPiezas.setBounds(margen + anchuraLabel + 55 + 10, posY - 2, dimPanelDatos.width - (margen + anchuraLabel + 10 + 55 + 20), dimTextField.height);
+        t_estNombreProvMasCantPiezas.setEditable(false);
+        t_estNombreProvMasCantPiezas.setText(proveedorConMasCantidadPiezas[1]);
+
+        posY += 30;
+
+        JLabel l_provMasProy = new JLabel("Proveedor que ha participado en distintos proyectos:", SwingConstants.LEFT);
+        confLabel(l_provMasProy);
+        panelDatos.add(l_provMasProy);
+        l_provMasProy.setBounds(margen, posY, anchuraLabel, dimLabel.height);
+
+        t_estCodProvMasProy = new JTextField();
+        panelDatos.add(t_estCodProvMasProy);
+        t_estCodProvMasProy.setBounds(margen + anchuraLabel, posY - 2, 55, dimTextField.height);
+        t_estCodProvMasProy.setEditable(false);
+        t_estCodProvMasProy.setText(proveedorConMasProyectosDistintos[0]);
+        t_estCodProvMasProy.setHorizontalAlignment(SwingConstants.CENTER);
+
+        t_estNombreProvMasProy = new JTextField();
+        panelDatos.add(t_estNombreProvMasProy);
+        t_estNombreProvMasProy.setBounds(margen + anchuraLabel + 55 + 10, posY - 2, dimPanelDatos.width - (margen + anchuraLabel + 10 + 55 + 20), dimTextField.height);
+        t_estNombreProvMasProy.setEditable(false);
+        t_estNombreProvMasProy.setText(proveedorConMasProyectosDistintos[1]);
+
+        posY += 30;
+
+        JLabel l_provMasPiezasDistintas = new JLabel("Proveedor que ha suministrado más piezas distintas:", SwingConstants.LEFT);
+        confLabel(l_provMasPiezasDistintas);
+        panelDatos.add(l_provMasPiezasDistintas);
+        l_provMasPiezasDistintas.setBounds(margen, posY, anchuraLabel, dimLabel.height);
+
+        t_estCodProvMasPiezasDistintas = new JTextField();
+        panelDatos.add(t_estCodProvMasPiezasDistintas);
+        t_estCodProvMasPiezasDistintas.setBounds(margen + anchuraLabel, posY - 2, 55, dimTextField.height);
+        t_estCodProvMasPiezasDistintas.setEditable(false);
+        t_estCodProvMasPiezasDistintas.setText(proveedorConMasPiezasDistintas[0]);
+        t_estCodProvMasPiezasDistintas.setHorizontalAlignment(SwingConstants.CENTER);
+
+        t_estNombreProvMasPiezasDistintas = new JTextField();
+        panelDatos.add(t_estNombreProvMasPiezasDistintas);
+        t_estNombreProvMasPiezasDistintas.setBounds(margen + anchuraLabel + 55 + 10, posY - 2, dimPanelDatos.width - (margen + anchuraLabel + 10 + 55 + 20), dimTextField.height);
+        t_estNombreProvMasPiezasDistintas.setEditable(false);
+        t_estNombreProvMasPiezasDistintas.setText(proveedorConMasPiezasDistintas[1]);
+
+        posY += 40;
+
+        JLabel piePagina = new JLabel("Fin del proyecto", SwingConstants.CENTER);
+        panelDatos.add(piePagina);
+        piePagina.setBounds(0, posY + 45, dimPanelDatos.width, 60);
+        piePagina.setFont(new Font("Calibri", Font.BOLD, 35));
+        piePagina.setForeground(Color.WHITE);
+
+        JPanel fondoPiePagina = new JPanel();
+        fondoPiePagina.setLayout(null);
+        fondoPiePagina.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
+        panelDatos.add(fondoPiePagina);
+        fondoPiePagina.setBounds(0, posY, dimPanelDatos.width, dimPanelDatos.height - posY);
+        fondoPiePagina.setBackground(Color.DARK_GRAY);
+
+        b_estNumPiezasProyecto.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cargarVentanaListadoEstadisticas(1, 2);
+            }
+        });
+        b_estNumPiezasProveedor.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cargarVentanaListadoEstadisticas(2, 2);
+            }
+        });
+
+        System.out.println("  Ventana cargada\n");
+    }
+    public void cargarVentanaListadoEstadisticas(int tabla, int volverA) {
+        String subtitulo;
+        if (tabla == 1) {
+            System.out.println("Estadísticas: Listado Piezas de las Gestiones + Resumen Histórico");
+            subtitulo = "PIEZAS: DATOS Y RESUMEN HISTÓRICO";
+        } else {
+            System.out.println("Estadísticas: Listado Proveedores de las Gestiones + Resumen Histórico");
+            subtitulo = "PROVEEDORES: DATOS Y RESUMEN HISTÓRICO";
+        }
+        System.out.println("  Cargando datos");
+
+        ArrayList<ProveedoresEntity> proveedoresGestion = new ArrayList<>();
+        ArrayList<PiezasEntity> piezasGestion = new ArrayList<>();
+
+        if (tabla == 1) {
+            if (filtrarEstadisticas)
+                piezasGestion = CargarDatos.piezasGestion();
+            else
+                piezasGestion = CargarDatos.piezas();
+            System.out.println("  Datos cargados: " + piezasGestion.size());
+        }
+        else {
+            if (filtrarEstadisticas)
+                proveedoresGestion = CargarDatos.proveedoresGestion();
+            else
+                proveedoresGestion = CargarDatos.proveedores();
+            System.out.println("  Datos cargados: " + proveedoresGestion.size());
+        }
+        System.out.println("  Cargando ventana");
+
+        try {
+            panelDatos.removeAll();
+            panelDatos.repaint();
+        } catch (Exception ignored) { }
+
+        panelDatos.setLayout(null);
 
 
+        JLabel l_titulo = new JLabel("RESÚMENES ESTADÍSTICOS", SwingConstants.CENTER);
+        l_titulo.setFont(new Font("Arial", Font.BOLD, 25));
+        l_titulo.setForeground(Color.DARK_GRAY);
+        panelDatos.add(l_titulo);
+        l_titulo.setBounds(0, 15, dimPanelDatos.width, dimLabel.height + 10);
 
-        System.out.println("   Ventana cargada");
+        JLabel l_subtitulo = new JLabel(subtitulo, SwingConstants.CENTER);
+        l_subtitulo.setFont(new Font("Arial", Font.BOLD, 18));
+        l_subtitulo.setForeground(Color.DARK_GRAY);
+        panelDatos.add(l_subtitulo);
+        l_subtitulo.setBounds(0, 42, dimPanelDatos.width, dimLabel.height);
+
+        JPanel lineaSeparadora = new JPanel();
+        lineaSeparadora.setLayout(null);
+        lineaSeparadora.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
+        panelDatos.add(lineaSeparadora);
+        lineaSeparadora.setBounds(0, 75, dimPanelDatos.width, 8);
+        lineaSeparadora.setBackground(Color.DARK_GRAY);
+
+        int posY = 80;
+        int margen = 10;
+
+        JTable table = new JTable() {
+            public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
+                Component returnComp = super.prepareRenderer(renderer, row, column);
+                Color alternateColor = new Color(0xd4d4d4);
+                Color whiteColor = Color.WHITE;
+                if (!returnComp.getBackground().equals(getSelectionBackground())) {
+                    Color bg = (row % 2 == 0 ? alternateColor : whiteColor);
+                    returnComp.setBackground(bg);
+                    bg = null;
+                }
+                return returnComp;
+            }
+        };
+        if (tabla == 2) {
+            ModeloListadoEstProveedores mlp = new ModeloListadoEstProveedores(proveedoresGestion);
+            table.setModel(mlp);
+
+            JScrollPane scrollPane = new JScrollPane(table);
+            panelDatos.add(scrollPane);
+            scrollPane.setBounds(1, posY, dimPanelDatos.width - 1, dimPanelDatos.height - posY - 55 - 10);
+            int[] widthsListadoProveedores = {70, 129, 200, 100, 100, dimPanelDatos.width - 1};
+            resizeColumnWidth(table, widthsListadoProveedores);
+        } else {
+            ModeloListadoEstPiezas mlp = new ModeloListadoEstPiezas(piezasGestion);
+            table.setModel(mlp);
+
+            JScrollPane scrollPane = new JScrollPane(table);
+            panelDatos.add(scrollPane);
+            scrollPane.setBounds(1, posY, dimPanelDatos.width - 1, dimPanelDatos.height - posY - 55 - 10);
+            int[] widthsListadoPiezas = {70, 219, 50, 120, 120, dimPanelDatos.width - 1};
+            resizeColumnWidth(table, widthsListadoPiezas);
+        }
+        posY = dimPanelDatos.height - 55;
+
+        JButton b_volver = new JButton("Volver");
+        confBoton(b_volver, dimBoton);
+        panelDatos.add(b_volver);
+        b_volver.setBounds(dimPanelDatos.width - 140, posY, 80, dimBoton.height);
+
+        JLabel l_provFiltrar1 = new JLabel("Filtrar estadísticas por aquellos", SwingConstants.RIGHT);
+        confLabel(l_provFiltrar1);
+        panelDatos.add(l_provFiltrar1);
+        l_provFiltrar1.setBounds(60, posY + 3, 210, dimLabel.height);
+
+        JLabel l_provFiltrar2 = new JLabel("datos que participen en gestiones", SwingConstants.RIGHT);
+        confLabel(l_provFiltrar2);
+        panelDatos.add(l_provFiltrar2);
+        l_provFiltrar2.setBounds(60, posY + 17, 210, dimLabel.height);
+
+        JCheckBox check_filtrarEstadisticas = new JCheckBox();
+        panelDatos.add(check_filtrarEstadisticas);
+        check_filtrarEstadisticas.setBounds(60 + 215, posY + 10, 20, 20);
+        if (filtrarEstadisticas)
+            check_filtrarEstadisticas.setSelected(true);
+
+        b_volver.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (volverA == 1)
+                    cargarVentanaSuministros();
+                else
+                    cargarVentanaEstadisticas();
+            }
+        });
+        check_filtrarEstadisticas.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (filtrarEstadisticas) {
+                    filtrarEstadisticas = false;
+                } else {
+                    filtrarEstadisticas = true;
+                }
+                cargarVentanaListadoEstadisticas(tabla, volverA);
+            }
+        });
+
+        System.out.println("  Ventana cargada\n");
     }
 
     // PIEZA
     public void cargarVentanaPiezaGestion() {
+        System.out.println("Piezas: Gestión");
         System.out.println("  Cargando datos");
         piezas = CargarDatos.piezas();
         System.out.println("  Datos cargados: " + piezas.size());
@@ -2215,6 +2541,7 @@ public class VentanaPrincipal {
 
     // PROYECTO
     public void cargarVentanaProyectoGestion() {
+        System.out.println("Proyectos: Gestión");
         System.out.println("  Cargando datos");
         proyectos = CargarDatos.proyectos();
         System.out.println("  Datos cargados: " + proyectos.size());
@@ -2512,6 +2839,7 @@ public class VentanaPrincipal {
 
     // PROVEEDOR
     public void cargarVentanaProveedorGestion() {
+        System.out.println("Proveedores: Gestión");
         System.out.println("  Cargando datos");
         proveedores = CargarDatos.proveedores();
         System.out.println("  Datos cargados: " + proveedores.size());
@@ -2843,7 +3171,6 @@ public class VentanaPrincipal {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (numVentana != 14) {
-                    System.out.println("Gestión: Administración");
                     cargarVentanaAdministracionGestion();
                     numVentana = 14;
                 }
@@ -2856,7 +3183,6 @@ public class VentanaPrincipal {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (numVentana != 15) {
-                    System.out.println("Estadísticas: Suministros");
                     cargarVentanaSuministros();
                     numVentana = 15;
                 }
@@ -2869,15 +3195,12 @@ public class VentanaPrincipal {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (numVentana != 16) {
-                    System.out.println("Estadísticas: Generales");
-                    // TODO CARGAR VENTANA ESTADISTICAS
                     cargarVentanaEstadisticas();
                     numVentana = 16;
                 }
             }
         });
     }
-
     public void menuProyectos(JMenuBar menuBar) {
         JMenu menu, subMenu;
         JMenuItem menuItem;
@@ -2893,7 +3216,6 @@ public class VentanaPrincipal {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (numVentana != 10) {
-                    System.out.println("Proyectos: Gestión");
                     cargarVentanaProyectoGestion();
                     numVentana = 10;
                 }
@@ -2942,7 +3264,6 @@ public class VentanaPrincipal {
 
         menu.add(subMenu); // AÑADIMOS EL SUBMENÚ YA CARGADO
     }
-
     public void menuPiezas(JMenuBar menuBar) {
         JMenu menu, subMenu;
         JMenuItem menuItem;
@@ -2958,7 +3279,6 @@ public class VentanaPrincipal {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (numVentana != 7) {
-                    System.out.println("Piezas: Gestión");
                     cargarVentanaPiezaGestion();
                     numVentana = 7;
                 }
@@ -2996,7 +3316,6 @@ public class VentanaPrincipal {
 
         menu.add(subMenu); // AÑADIMOS EL SUBMENÚ YA CARGADO
     }
-
     public void menuProveedores(JMenuBar menuBar) {
         JMenu menu, subMenu;
         JMenuItem menuItem;
@@ -3012,7 +3331,6 @@ public class VentanaPrincipal {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (numVentana != 3) {
-                    System.out.println("Proveedores: Gestión");
                     cargarVentanaProveedorGestion();
                     numVentana = 3;
                 }
@@ -3063,7 +3381,6 @@ public class VentanaPrincipal {
 
         menu.add(subMenu); // AÑADIMOS EL SUBMENÚ YA CARGADO
     }
-
     public void menuBBDD(JMenuBar menuBar) {
         JMenu menu;
         JMenuItem menuItem;

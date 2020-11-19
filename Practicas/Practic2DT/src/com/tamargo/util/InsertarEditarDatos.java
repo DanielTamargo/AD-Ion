@@ -18,7 +18,6 @@ public class InsertarEditarDatos {
         try {
             return HibernateUtil.getSessionFactory();
         } catch (HibernateException ignored) {
-            // TODO LOGGER
             return null;
         }
     }

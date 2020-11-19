@@ -19,7 +19,7 @@ public class ModeloListadoGestiones extends AbstractTableModel {
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         GestionEntity gestion = gestiones.get(rowIndex);
-        Color color = new Color(0xc5dbdb);
+
         try {
             return switch (columnIndex) {
                 case 0 -> gestion.getProveedoresByCodProveedor().getCodigo();
