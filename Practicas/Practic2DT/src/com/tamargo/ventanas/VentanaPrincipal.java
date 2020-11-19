@@ -1208,9 +1208,9 @@ public class VentanaPrincipal {
         // LINEA
         JPanel linea = new JPanel();
         linea.setLayout(null);
-        linea.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        linea.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
         panelDatos.add(linea);
-        linea.setBounds(0, 70, dimPanelDatos.width, 1);
+        linea.setBounds(0, 70, dimPanelDatos.width, 2);
 
 
         // Utilizaremos otro panel donde cargamos la ventana normal que sustituiremos por el listado cada vez que cliquemos en el botón
@@ -1518,7 +1518,7 @@ public class VentanaPrincipal {
         String[] piezaMasCantidadVecesSuministrada = CargarDatos.cargarDatosPiezaMasCantidadVecesSuministrada();
         String[] piezaMasVecesDistintasSuministrada = CargarDatos.cargarDatosPiezaMasVecesDistintasSuministrada();
 
-        //System.out.println("  Datos cargados");
+        System.out.println("  Datos cargados");
 
         System.out.println("  Cargando ventana");
         try {
@@ -1782,9 +1782,10 @@ public class VentanaPrincipal {
         // SEPARADOR
         JPanel lineaSeparadora = new JPanel();
         lineaSeparadora.setLayout(null);
-        lineaSeparadora.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        lineaSeparadora.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
         panelDatos.add(lineaSeparadora);
-        lineaSeparadora.setBounds(0, 227, dimPanelDatos.width, 2);
+        lineaSeparadora.setBounds(0, 226, dimPanelDatos.width, 4);
+        lineaSeparadora.setBackground(Color.DARK_GRAY);
 
         // PARTE PIEZAS
         JLabel l_pzaTitulo = new JLabel("SUMINISTROS POR PIEZA", SwingConstants.LEFT);

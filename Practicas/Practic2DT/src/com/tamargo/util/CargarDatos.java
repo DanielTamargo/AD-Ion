@@ -222,8 +222,6 @@ public class CargarDatos {
                         codPzaActual = pza.getCodigo();
                     }
 
-                    System.out.println(pza.getCodigo() + " | " + cantidad);
-
                     cantidadTotal += cantidad;
 
                     if (cantidadTotal > cantidadTotalMax) {
