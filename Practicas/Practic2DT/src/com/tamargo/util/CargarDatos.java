@@ -10,9 +10,11 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TreeMap;
 
 public class CargarDatos {
     
@@ -22,7 +24,6 @@ public class CargarDatos {
         try {
             return HibernateUtil.getSessionFactory();
         } catch (HibernateException ignored) {
-            // TODO LOGGER
             return null;
         }
     }
@@ -131,6 +132,298 @@ public class CargarDatos {
         return numPiezas;
     }
 
+    public static String[] cargarDatosPiezaMasVecesDistintasSuministrada() {
+        String codPieza = "";
+        String datosPieza = "";
+
+        if (sessionFactory != null) {
+            Session session = null;
+            try {
+                session = sessionFactory.openSession();
+            } catch (HibernateException ignored) { }
+
+            if (session != null) {
+                String hql = "select g.piezasByCodPieza, g.proyectosByCodProyecto " +
+                        " from GestionEntity g " +
+                        " order by g.piezasByCodPieza.codigo";
+                Query q = session.createQuery(hql);
+                Iterator iter = q.iterate();
+
+                ArrayList<String> proyectos = new ArrayList<>();
+                String codPzaActual = "";
+                PiezasEntity pieza = null;
+                long cantidadTotalMax = -1;
+
+                while (iter.hasNext()) {
+                    Object[] objLeidos = (Object[]) iter.next();
+                    PiezasEntity pza = (PiezasEntity) objLeidos[0];
+                    ProyectosEntity proyec = (ProyectosEntity) objLeidos[1];
+
+                    if (!codPzaActual.equalsIgnoreCase(pza.getCodigo())) {
+                        proyectos = new ArrayList<>();
+                        codPzaActual = pza.getCodigo();
+                    }
+
+                    if (!proyectos.contains(proyec.getCodigo()))
+                        proyectos.add(proyec.getCodigo());
+
+
+                    if (proyectos.size() > cantidadTotalMax) {
+                        pieza = pza;
+                        cantidadTotalMax = proyectos.size();
+                    }
+                }
+
+                if (pieza != null) {
+                    codPieza = pieza.getCodigo();
+                    datosPieza = String.format("%s (%d veces)", pieza.getNombre(), cantidadTotalMax);
+                }
+
+
+                session.close();
+            } else {
+                System.out.println("No se pudo abrir una sesión. Imposible cargar.");
+            }
+        } else {
+            System.out.println("SessionFactory no existente. Imposible cargar.");
+        }
+
+        return new String[]{codPieza,datosPieza};
+    }
+
+    public static String[] cargarDatosPiezaMasCantidadVecesSuministrada() {
+        String codPieza = "";
+        String datosPieza = "";
+
+        if (sessionFactory != null) {
+            Session session = null;
+            try {
+                session = sessionFactory.openSession();
+            } catch (HibernateException ignored) { }
+
+            if (session != null) {
+                String hql = "select g.piezasByCodPieza, g.cantidad " +
+                        " from GestionEntity g " +
+                        " order by g.piezasByCodPieza.codigo";
+                Query q = session.createQuery(hql);
+                Iterator iter = q.iterate();
+
+                float cantidadTotalMax = -1;
+                float cantidadTotal = 0;
+                String codPzaActual = "";
+                PiezasEntity pieza = null;
+                while (iter.hasNext()) {
+                    Object[] objLeidos = (Object[]) iter.next();
+                    PiezasEntity pza = (PiezasEntity) objLeidos[0];
+                    double cantidad = (double) objLeidos[1];
+
+                    if (!codPzaActual.equalsIgnoreCase(pza.getCodigo())) {
+                        cantidadTotal = 0;
+                        codPzaActual = pza.getCodigo();
+                    }
+
+                    System.out.println(pza.getCodigo() + " | " + cantidad);
+
+                    cantidadTotal += cantidad;
+
+                    if (cantidadTotal > cantidadTotalMax) {
+                        pieza = pza;
+                        cantidadTotalMax = cantidadTotal;
+                    }
+                }
+
+                if (pieza != null) {
+                    codPieza = pieza.getCodigo();
+                    datosPieza = String.format("%s (%.0f veces)", pieza.getNombre(), cantidadTotalMax);
+                }
+
+                session.close();
+            } else {
+                System.out.println("No se pudo abrir una sesión. Imposible cargar.");
+            }
+        } else {
+            System.out.println("SessionFactory no existente. Imposible cargar.");
+        }
+        
+        return new String[]{ codPieza, datosPieza };
+        
+    }
+    
+    public static String[] cargarDatosProvConMasProyectosDistintos() {
+        String codProveedor = "";
+        String datosProveedor = "";
+
+        if (sessionFactory != null) {
+            Session session = null;
+            try {
+                session = sessionFactory.openSession();
+            } catch (HibernateException ignored) { }
+
+            if (session != null) {
+                String hql = "select g.proveedoresByCodProveedor, g.proyectosByCodProyecto " +
+                        " from GestionEntity g " +
+                        " order by g.proveedoresByCodProveedor.codigo";
+                Query q = session.createQuery(hql);
+                Iterator iter = q.iterate();
+
+                ArrayList<String> proyectos = new ArrayList<>();
+                String codProvActual = "";
+                ProveedoresEntity proveedor = null;
+                long cantidadTotalMax = -1;
+
+                while (iter.hasNext()) {
+                    Object[] objLeidos = (Object[]) iter.next();
+                    ProveedoresEntity prov = (ProveedoresEntity) objLeidos[0];
+                    ProyectosEntity proyec = (ProyectosEntity) objLeidos[1];
+
+                    if (!codProvActual.equalsIgnoreCase(prov.getCodigo())) {
+                        proyectos = new ArrayList<>();
+                        codProvActual = prov.getCodigo();
+                    }
+
+                    if (!proyectos.contains(proyec.getCodigo()))
+                        proyectos.add(proyec.getCodigo());
+
+
+                    if (proyectos.size() > cantidadTotalMax) {
+                        proveedor = prov;
+                        cantidadTotalMax = proyectos.size();
+                    }
+                }
+
+                if (proveedor != null) {
+                    codProveedor = proveedor.getCodigo();
+                    datosProveedor = String.format("%s %s (%d proyectos)", proveedor.getNombre(),
+                            proveedor.getApellidos(), cantidadTotalMax);
+                }
+
+
+                session.close();
+            } else {
+                System.out.println("No se pudo abrir una sesión. Imposible cargar.");
+            }
+        } else {
+            System.out.println("SessionFactory no existente. Imposible cargar.");
+        }
+
+        return new String[]{codProveedor,datosProveedor};
+    }
+
+    public static String[] cargarDatosProvConMasCantidadPiezas() {
+        String codProveedor = "";
+        String datosProveedor = "";
+
+        if (sessionFactory != null) {
+            Session session = null;
+            try {
+                session = sessionFactory.openSession();
+            } catch (HibernateException ignored) { }
+
+            if (session != null) {
+                String hql = "select g.proveedoresByCodProveedor, g.cantidad " +
+                        " from GestionEntity g " +
+                        " order by g.proveedoresByCodProveedor.codigo";
+                Query q = session.createQuery(hql);
+                Iterator iter = q.iterate();
+
+                float cantidadTotalMax = -1;
+                float cantidadTotal = 0;
+                String codProvActual = "";
+                ProveedoresEntity proveedor = null;
+                while (iter.hasNext()) {
+                    Object[] objLeidos = (Object[]) iter.next();
+                    ProveedoresEntity prov = (ProveedoresEntity) objLeidos[0];
+                    double cantidad = (double) objLeidos[1];
+
+                    if (!codProvActual.equalsIgnoreCase(prov.getCodigo())) {
+                        cantidadTotal = 0;
+                        codProvActual = prov.getCodigo();
+                    }
+
+                    cantidadTotal += cantidad;
+
+                    if (cantidadTotal > cantidadTotalMax) {
+                        proveedor = prov;
+                        cantidadTotalMax = cantidadTotal;
+                    }
+                }
+
+                if (proveedor != null) {
+                    codProveedor = proveedor.getCodigo();
+                    datosProveedor = String.format("%s %s (%.0f piezas)", proveedor.getNombre(),
+                            proveedor.getApellidos(), cantidadTotalMax);
+                }
+                session.close();
+            } else {
+                System.out.println("No se pudo abrir una sesión. Imposible cargar.");
+            }
+        } else {
+            System.out.println("SessionFactory no existente. Imposible cargar.");
+        }
+
+        return new String[]{codProveedor,datosProveedor};
+    }
+
+    public static String[] cargarDatosProvConMasPiezasDistintas() {
+        String codProveedor = "";
+        String datosProveedor = "";
+
+        if (sessionFactory != null) {
+            Session session = null;
+            try {
+                session = sessionFactory.openSession();
+            } catch (HibernateException ignored) { }
+
+            if (session != null) {
+                String hql = "select g.proveedoresByCodProveedor, g.piezasByCodPieza " +
+                        " from GestionEntity g " +
+                        " order by g.proveedoresByCodProveedor.codigo";
+                Query q = session.createQuery(hql);
+                Iterator iter = q.iterate();
+
+                ArrayList<String> piezas = new ArrayList<>();
+                String codProvActual = "";
+                ProveedoresEntity proveedor = null;
+                long cantidadTotalMax = -1;
+
+                while (iter.hasNext()) {
+                    Object[] objLeidos = (Object[]) iter.next();
+                    ProveedoresEntity prov = (ProveedoresEntity) objLeidos[0];
+                    PiezasEntity pza = (PiezasEntity) objLeidos[1];
+
+                    if (!codProvActual.equalsIgnoreCase(prov.getCodigo())) {
+                        piezas = new ArrayList<>();
+                        codProvActual = prov.getCodigo();
+                    }
+
+                    if (!piezas.contains(pza.getCodigo()))
+                        piezas.add(pza.getCodigo());
+
+
+                    if (piezas.size() > cantidadTotalMax) {
+                        proveedor = prov;
+                        cantidadTotalMax = piezas.size();
+                    }
+                }
+
+                if (proveedor != null) {
+                    codProveedor = proveedor.getCodigo();
+                    datosProveedor = String.format("%s %s (%d piezas)", proveedor.getNombre(),
+                            proveedor.getApellidos(), cantidadTotalMax);
+                }
+
+
+                session.close();
+            } else {
+                System.out.println("No se pudo abrir una sesión. Imposible cargar.");
+            }
+        } else {
+            System.out.println("SessionFactory no existente. Imposible cargar.");
+        }
+
+        return new String[]{codProveedor,datosProveedor};
+    }
+
     public static boolean gestionProvPiezProyExiste(String codProv, String codPieza, String codProyecto) {
         boolean existe = false;
         if (sessionFactory != null) {
@@ -153,10 +446,10 @@ public class CargarDatos {
                     existe = true;
                 session.close();
             } else {
-                System.out.println("No se pudo abrir una sesión. Imposible cargar la cantidad.");
+                System.out.println("No se pudo abrir una sesión. Imposible cargar.");
             }
         } else {
-            System.out.println("SessionFactory no existente. Imposible cargar la cantidad.");
+            System.out.println("SessionFactory no existente. Imposible cargar.");
         }
 
         return existe;
@@ -355,7 +648,7 @@ public class CargarDatos {
             } catch (HibernateException ignored) { }
 
             if (session != null) {
-                String hql = "from GestionEntity ";
+                String hql = "from GestionEntity g order by g.codigo desc";
                 Query q = session.createQuery(hql);
                 List<GestionEntity> lista = q.list();
 
