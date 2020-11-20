@@ -453,6 +453,30 @@ public class CargarDatos {
         return existe;
     }
 
+    public static long cargarNumGestiones() {
+        long numGestiones = 0;
+
+        if (sessionFactory != null) {
+            Session session = null;
+            try {
+                session = sessionFactory.openSession();
+            } catch (HibernateException ignored) { }
+
+            if (session != null) {
+                String hql = "select count(*) from GestionEntity p";
+                Query q = session.createQuery(hql).setMaxResults(1);
+                numGestiones = (long) q.uniqueResult();
+                session.close();
+            } else {
+                System.out.println("No se pudo abrir una sesión. Imposible cargar la cantidad.");
+            }
+        } else {
+            System.out.println("SessionFactory no existente. Imposible cargar la cantidad.");
+        }
+
+        return numGestiones;
+    }
+
     public static long cargarNumProvPiezaProyGestion(String codProv, String codPieza, String codProyecto) {
         long numProvPiezaProyecto = 0;
 

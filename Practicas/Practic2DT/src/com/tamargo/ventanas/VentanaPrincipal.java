@@ -1238,8 +1238,10 @@ public class VentanaPrincipal {
 
         String gif;
         if (numGif == 2) {
+            System.out.println("Inicio: Tostada\n");
             gif = "./assets/2-tostada.gif";
         } else {
+            System.out.println("Inicio: Cohete\n");
             gif = "./assets/1-cohete.gif";
         }
 
@@ -2069,6 +2071,48 @@ public class VentanaPrincipal {
         });
 
         System.out.println("  Ventana cargada\n");
+
+        if (CargarDatos.cargarNumGestiones() <= 0) {
+            JButton ok = new JButton("Ok");
+            JButton volverAInicio = new JButton("Volver a inicio");
+            JButton nuevaGestion = new JButton("Ir al panel");
+            ok.setFocusPainted(false);
+            volverAInicio.setFocusPainted(false);
+            nuevaGestion.setFocusPainted(false);
+
+            Object[] options = { ok, volverAInicio, nuevaGestion };
+
+            String titulo = "Sin datos";
+            String mensaje = "No existen gestiones, por lo que no se van a generar los datos de las\n" +
+                    "estadísticas. Para generar nuevas gestiones ve al panel de administración de gestiones.";
+
+            final JOptionPane pane = new JOptionPane(mensaje,
+                    JOptionPane.WARNING_MESSAGE, JOptionPane.YES_NO_OPTION, null, options);
+            JDialog dialog = pane.createDialog(titulo);
+            ok.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    dialog.dispose();
+                }
+            });
+            volverAInicio.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    dialog.dispose();
+                    cargarVentanaInicio(1);
+                    numVentana = 1;
+                }
+            });
+            nuevaGestion.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    dialog.dispose();
+                    cargarVentanaAdministracionGestion();
+                    numVentana = 14;
+                }
+            });
+            dialog.setVisible(true);
+        }
     }
     public void cargarVentanaListadoEstadisticas(int tabla, int volverA) {
         String subtitulo;
@@ -3171,8 +3215,8 @@ public class VentanaPrincipal {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (numVentana != 14) {
-                    cargarVentanaAdministracionGestion();
                     numVentana = 14;
+                    cargarVentanaAdministracionGestion();
                 }
             }
         });
@@ -3183,8 +3227,8 @@ public class VentanaPrincipal {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (numVentana != 15) {
-                    cargarVentanaSuministros();
                     numVentana = 15;
+                    cargarVentanaSuministros();
                 }
             }
         });
@@ -3195,8 +3239,8 @@ public class VentanaPrincipal {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (numVentana != 16) {
-                    cargarVentanaEstadisticas();
                     numVentana = 16;
+                    cargarVentanaEstadisticas();
                 }
             }
         });
@@ -3216,8 +3260,8 @@ public class VentanaPrincipal {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (numVentana != 10) {
-                    cargarVentanaProyectoGestion();
                     numVentana = 10;
+                    cargarVentanaProyectoGestion();
                 }
             }
         });
@@ -3232,8 +3276,8 @@ public class VentanaPrincipal {
             public void actionPerformed(ActionEvent e) {
                 if (numVentana != 11) {
                     System.out.println("Proyectos: Búsqueda por Código");
-                    cargarVentanaProyectoBuscar(1);
                     numVentana = 11;
+                    cargarVentanaProyectoBuscar(1);
                 }
             }
         });
@@ -3244,8 +3288,8 @@ public class VentanaPrincipal {
             public void actionPerformed(ActionEvent e) {
                 if (numVentana != 12) {
                     System.out.println("Proyectos: Búsqueda por Nombre");
-                    cargarVentanaProyectoBuscar(2);
                     numVentana = 12;
+                    cargarVentanaProyectoBuscar(2);
                 }
             }
         });
@@ -3256,8 +3300,8 @@ public class VentanaPrincipal {
             public void actionPerformed(ActionEvent e) {
                 if (numVentana != 13) {
                     System.out.println("Proyectos: Búsqueda por Ciudad");
-                    cargarVentanaProyectoBuscar(3);
                     numVentana = 13;
+                    cargarVentanaProyectoBuscar(3);
                 }
             }
         });
@@ -3279,8 +3323,8 @@ public class VentanaPrincipal {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (numVentana != 7) {
-                    cargarVentanaPiezaGestion();
                     numVentana = 7;
+                    cargarVentanaPiezaGestion();
                 }
             }
         });
@@ -3295,8 +3339,8 @@ public class VentanaPrincipal {
             public void actionPerformed(ActionEvent e) {
                 if (numVentana != 8) {
                     System.out.println("Piezas: Búsqueda por Código");
-                    cargarVentanaPiezaBuscar(1);
                     numVentana = 8;
+                    cargarVentanaPiezaBuscar(1);
                 }
             }
         });
@@ -3308,8 +3352,8 @@ public class VentanaPrincipal {
             public void actionPerformed(ActionEvent e) {
                 if (numVentana != 9) {
                     System.out.println("Piezas: Búsqueda por Nombre");
-                    cargarVentanaPiezaBuscar(2);
                     numVentana = 9;
+                    cargarVentanaPiezaBuscar(2);
                 }
             }
         });
@@ -3331,8 +3375,8 @@ public class VentanaPrincipal {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (numVentana != 3) {
-                    cargarVentanaProveedorGestion();
                     numVentana = 3;
+                    cargarVentanaProveedorGestion();
                 }
             }
         });
@@ -3347,8 +3391,8 @@ public class VentanaPrincipal {
             public void actionPerformed(ActionEvent e) {
                 if (numVentana != 4) {
                     System.out.println("Proveedores: Búsqueda por Código");
-                    cargarVentanaProveedorBuscar(1);
                     numVentana = 4;
+                    cargarVentanaProveedorBuscar(1);
                 }
             }
         });
@@ -3360,8 +3404,8 @@ public class VentanaPrincipal {
             public void actionPerformed(ActionEvent e) {
                 if (numVentana != 5) {
                     System.out.println("Proveedores: Búsqueda por Nombre");
-                    cargarVentanaProveedorBuscar(2);
                     numVentana = 5;
+                    cargarVentanaProveedorBuscar(2);
                 }
             }
         });
@@ -3373,8 +3417,8 @@ public class VentanaPrincipal {
             public void actionPerformed(ActionEvent e) {
                 if (numVentana != 6) {
                     System.out.println("Proveedores: Búsqueda por Dirección");
-                    cargarVentanaProveedorBuscar(3);
                     numVentana = 6;
+                    cargarVentanaProveedorBuscar(3);
                 }
             }
         });
@@ -3394,9 +3438,8 @@ public class VentanaPrincipal {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (numVentana != 1) {
-                    System.out.println("Inicio: Cohete\n");
-                    cargarVentanaInicio(1);
                     numVentana = 1;
+                    cargarVentanaInicio(1);
                 }
             }
         });
@@ -3408,9 +3451,8 @@ public class VentanaPrincipal {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (numVentana != 2) {
-                    System.out.println("Inicio: Tostada\n");
-                    cargarVentanaInicio(2);
                     numVentana = 2;
+                    cargarVentanaInicio(2);
                 }
             }
         });

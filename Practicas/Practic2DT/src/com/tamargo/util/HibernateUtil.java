@@ -15,8 +15,8 @@ public class HibernateUtil {
         }
         catch (Throwable ex)
         {
-            System.err.println("Initial SessionFactory creation failed." + ex);
-            throw new ExceptionInInitializerError(ex);
+            System.err.println("Error al arrancar el sessionFactory." + ex);
+            return null;
         }
     }
     public static SessionFactory getSessionFactory()
