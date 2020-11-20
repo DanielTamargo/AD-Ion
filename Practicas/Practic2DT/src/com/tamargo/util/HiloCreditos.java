@@ -31,7 +31,7 @@ public class HiloCreditos extends Thread {
         fondo.setIcon(new ImageIcon("./assets/4-creditosFondo.gif"));
 
         bucle = true;
-        int tiempoEspera = 30;
+        int tiempoEspera = 25;
 
         int n = -147;
         int i = 0;

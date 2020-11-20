@@ -8,6 +8,7 @@ import org.hibernate.*;
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.query.Query;
 
+import javax.persistence.PersistenceException;
 import javax.swing.*;
 
 public class InsertarEditarDatos {
@@ -92,6 +93,11 @@ public class InsertarEditarDatos {
                     mostrarJOptionPane(titulo, mensaje, 0);
                     System.out.println("Error al insertar/editar. No se puede insertar/editar una gestión\nque no existe o está cargada correctamente");
                     accionCompletada = false;
+                } catch (PersistenceException ignored) {
+                    String mensaje = "Error al insertar/editar. Uno o varios datos son demasiados largos";
+                    mostrarJOptionPane(titulo, mensaje, 0);
+                    System.out.println(mensaje);
+                    accionCompletada = false;
                 }
                 session.close();
             } else {
@@ -162,6 +168,11 @@ public class InsertarEditarDatos {
                     String mensaje = "Error al insertar/editar. No se puede insertar/editar un proveedor\nque no existe o está cargado correctamente";
                     mostrarJOptionPane(titulo, mensaje, 0);
                     System.out.println("Error al insertar/editar. No se puede insertar/editar un proveedor\nque no existe o está cargado correctamente");
+                    accionCompletada = false;
+                } catch (PersistenceException ignored) {
+                    String mensaje = "Error al insertar/editar. Uno o varios datos son demasiados largos";
+                    mostrarJOptionPane(titulo, mensaje, 0);
+                    System.out.println(mensaje);
                     accionCompletada = false;
                 }
                 session.close();
@@ -234,6 +245,11 @@ public class InsertarEditarDatos {
                     mostrarJOptionPane(titulo, mensaje, 0);
                     System.out.println("Error al insertar/editar. No se puede insertar/editar una pieza\nque no existe o está cargada correctamente");
                     accionCompletada = false;
+                } catch (PersistenceException ignored) {
+                    String mensaje = "Error al insertar/editar. Uno o varios datos son demasiados largos";
+                    mostrarJOptionPane(titulo, mensaje, 0);
+                    System.out.println(mensaje);
+                    accionCompletada = false;
                 }
                 session.close();
             } else {
@@ -299,6 +315,11 @@ public class InsertarEditarDatos {
                     String mensaje = "Error al insertar/editar. No se puede insertar/editar un proyecto\nque no existe o está cargado correctamente";
                     mostrarJOptionPane(titulo, mensaje, 0);
                     System.out.println("Error al insertar/editar. No se puede insertar/editar un proyecto\nque no existe o está cargado correctamente");
+                    accionCompletada = false;
+                } catch (PersistenceException ignored) {
+                    String mensaje = "Error al insertar/editar. Uno o varios datos son demasiados largos";
+                    mostrarJOptionPane(titulo, mensaje, 0);
+                    System.out.println(mensaje);
                     accionCompletada = false;
                 }
                 session.close();

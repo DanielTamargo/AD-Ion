@@ -24,6 +24,8 @@ import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 
 public class VentanaPrincipal {
@@ -532,7 +534,6 @@ public class VentanaPrincipal {
             comboBox.setSelectedIndex(0);
         else
             vaciarDatosOpcionesPza(cod, nombre, precio, desc);
-
     }
     public void vaciarDatosOpcionesPza(JLabel cod, JLabel nombre, JLabel precio, JTextPane desc) {
         cod.setText("");
@@ -1281,6 +1282,7 @@ public class VentanaPrincipal {
 
     // ADMINISTRACIÓN GESTIÓN
     public void cargarVentanaAdministracionGestion() {
+        ventanaPrincipal.setTitle("Administración Gestiones");
         System.out.println("Gestión: Administración");
         System.out.println("  Cargando ventana");
         insertando = false;
@@ -2075,11 +2077,16 @@ public class VentanaPrincipal {
 
         posY += 40;
 
-        JLabel piePagina = new JLabel("Fin del proyecto", SwingConstants.CENTER);
+        /*JLabel piePagina = new JLabel("Fin del proyecto", SwingConstants.CENTER);
         panelDatos.add(piePagina);
         piePagina.setBounds(0, posY + 45, dimPanelDatos.width, 60);
         piePagina.setFont(new Font("Calibri", Font.BOLD, 35));
-        piePagina.setForeground(Color.WHITE);
+        piePagina.setForeground(Color.WHITE);*/
+
+        JLabel piePaginaGif = new JLabel();
+        panelDatos.add(piePaginaGif);
+        piePaginaGif.setBounds(0, posY, dimPanelDatos.width, dimPanelDatos.height - posY);
+        piePaginaGif.setIcon(new ImageIcon("./assets/3-piepagina.gif"));
 
         JPanel fondoPiePagina = new JPanel();
         fondoPiePagina.setLayout(null);
@@ -2286,6 +2293,7 @@ public class VentanaPrincipal {
 
     // PIEZA
     public void cargarVentanaPiezaGestion() {
+        ventanaPrincipal.setTitle("Administración Piezas");
         System.out.println("Piezas: Gestión");
         System.out.println("  Cargando datos");
         piezas = CargarDatos.piezas();
@@ -2618,6 +2626,7 @@ public class VentanaPrincipal {
 
     // PROYECTO
     public void cargarVentanaProyectoGestion() {
+        ventanaPrincipal.setTitle("Administración Proyectos");
         System.out.println("Proyectos: Gestión");
         System.out.println("  Cargando datos");
         proyectos = CargarDatos.proyectos();
@@ -2919,6 +2928,7 @@ public class VentanaPrincipal {
 
     // PROVEEDOR
     public void cargarVentanaProveedorGestion() {
+        ventanaPrincipal.setTitle("Administración Proveedores");
         System.out.println("Proveedores: Gestión");
         System.out.println("  Cargando datos");
         proveedores = CargarDatos.proveedores();
@@ -3241,7 +3251,7 @@ public class VentanaPrincipal {
     public void menuAyuda(JMenuBar menuBar) {
         JMenu menu;
 
-        menu = new JMenu("Ayuda");
+        menu = new JMenu("Créditos");
         menu.getAccessibleContext().setAccessibleDescription(
                 "Muestra información sobre la aplicación y su autor");
         menuBar.add(menu);
@@ -3250,6 +3260,7 @@ public class VentanaPrincipal {
             @Override
             public void menuSelected(MenuEvent e) {
                 if (numVentana != 17) {
+                    ventanaPrincipal.setTitle("Créditos");
                     numVentana = 17;
                     cargarVentanaCreditos();
                 }
@@ -3290,6 +3301,7 @@ public class VentanaPrincipal {
                 hc.parar();
                 if (numVentana != 15) {
                     numVentana = 15;
+                    ventanaPrincipal.setTitle("Suministros");
                     cargarVentanaSuministros();
                 }
             }
@@ -3303,6 +3315,7 @@ public class VentanaPrincipal {
                 hc.parar();
                 if (numVentana != 16) {
                     numVentana = 16;
+                    ventanaPrincipal.setTitle("Estadísticas");
                     cargarVentanaEstadisticas();
                 }
             }
@@ -3340,6 +3353,7 @@ public class VentanaPrincipal {
             public void actionPerformed(ActionEvent e) {
                 hc.parar();
                 if (numVentana != 11) {
+                    ventanaPrincipal.setTitle("Consulta Proyectos (por código)");
                     System.out.println("Proyectos: Búsqueda por Código");
                     numVentana = 11;
                     cargarVentanaProyectoBuscar(1);
@@ -3353,6 +3367,7 @@ public class VentanaPrincipal {
             public void actionPerformed(ActionEvent e) {
                 hc.parar();
                 if (numVentana != 12) {
+                    ventanaPrincipal.setTitle("Consulta Proyectos (por nombre)");
                     System.out.println("Proyectos: Búsqueda por Nombre");
                     numVentana = 12;
                     cargarVentanaProyectoBuscar(2);
@@ -3366,6 +3381,7 @@ public class VentanaPrincipal {
             public void actionPerformed(ActionEvent e) {
                 hc.parar();
                 if (numVentana != 13) {
+                    ventanaPrincipal.setTitle("Consulta Proyectos (por ciudad)");
                     System.out.println("Proyectos: Búsqueda por Ciudad");
                     numVentana = 13;
                     cargarVentanaProyectoBuscar(3);
@@ -3407,6 +3423,7 @@ public class VentanaPrincipal {
             public void actionPerformed(ActionEvent e) {
                 hc.parar();
                 if (numVentana != 8) {
+                    ventanaPrincipal.setTitle("Consulta Piezas (por código)");
                     System.out.println("Piezas: Búsqueda por Código");
                     numVentana = 8;
                     cargarVentanaPiezaBuscar(1);
@@ -3421,6 +3438,7 @@ public class VentanaPrincipal {
             public void actionPerformed(ActionEvent e) {
                 hc.parar();
                 if (numVentana != 9) {
+                    ventanaPrincipal.setTitle("Consulta Piezas (por nombre)");
                     System.out.println("Piezas: Búsqueda por Nombre");
                     numVentana = 9;
                     cargarVentanaPiezaBuscar(2);
@@ -3462,6 +3480,7 @@ public class VentanaPrincipal {
             public void actionPerformed(ActionEvent e) {
                 hc.parar();
                 if (numVentana != 4) {
+                    ventanaPrincipal.setTitle("Consulta Proveedores (por código)");
                     System.out.println("Proveedores: Búsqueda por Código");
                     numVentana = 4;
                     cargarVentanaProveedorBuscar(1);
@@ -3476,6 +3495,7 @@ public class VentanaPrincipal {
             public void actionPerformed(ActionEvent e) {
                 hc.parar();
                 if (numVentana != 5) {
+                    ventanaPrincipal.setTitle("Consulta Proveedores (por nombre)");
                     System.out.println("Proveedores: Búsqueda por Nombre");
                     numVentana = 5;
                     cargarVentanaProveedorBuscar(2);
@@ -3490,6 +3510,7 @@ public class VentanaPrincipal {
             public void actionPerformed(ActionEvent e) {
                 hc.parar();
                 if (numVentana != 6) {
+                    ventanaPrincipal.setTitle("Consulta Proveedores (por dirección)");
                     System.out.println("Proveedores: Búsqueda por Dirección");
                     numVentana = 6;
                     cargarVentanaProveedorBuscar(3);
@@ -3499,7 +3520,7 @@ public class VentanaPrincipal {
 
         menu.add(subMenu); // AÑADIMOS EL SUBMENÚ YA CARGADO
     }
-    public void menuBBDD(JMenuBar menuBar) {
+    public void menuInicio(JMenuBar menuBar) {
         JMenu menu;
         JMenuItem menuItem;
 
@@ -3513,6 +3534,7 @@ public class VentanaPrincipal {
             public void actionPerformed(ActionEvent e) {
                 hc.parar();
                 if (numVentana != 1) {
+                    ventanaPrincipal.setTitle("Inicio");
                     numVentana = 1;
                     cargarVentanaInicio(1);
                 }
@@ -3527,6 +3549,7 @@ public class VentanaPrincipal {
             public void actionPerformed(ActionEvent e) {
                 hc.parar();
                 if (numVentana != 2) {
+                    ventanaPrincipal.setTitle("Inicio");
                     numVentana = 2;
                     cargarVentanaInicio(2);
                 }
@@ -3544,7 +3567,7 @@ public class VentanaPrincipal {
         menuBar = new JMenuBar();
 
         // Inicio
-        menuBBDD(menuBar);
+        menuInicio(menuBar);
 
         // Proveedores
         menuProveedores(menuBar);
@@ -3576,8 +3599,8 @@ public class VentanaPrincipal {
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Lanzador ventana
-    public static void main(String[] args) {
-        JFrame frame = new JFrame("Ventana Principal");
+    public static void lanzarVentanaPrincipal() {
+        JFrame frame = new JFrame("Inicio");
         VentanaPrincipal vp = new VentanaPrincipal();
         vp.setVentanaPrincipal(frame);
         vp.configurarMenu();

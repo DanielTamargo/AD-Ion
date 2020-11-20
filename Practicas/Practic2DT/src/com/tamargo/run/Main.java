@@ -16,7 +16,7 @@ public class Main {
         comprobarHibernate();
 
         if (iniciar)
-            VentanaPrincipal.main(args);
+            VentanaPrincipal.lanzarVentanaPrincipal();
 
     }
 
