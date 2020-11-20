@@ -9,15 +9,13 @@ import com.tamargo.tablas.ModeloListadoEstProveedores;
 import com.tamargo.tablas.ModeloListadoGestiones;
 import com.tamargo.util.BorrarDatos;
 import com.tamargo.util.CargarDatos;
+import com.tamargo.util.HiloCreditos;
 import com.tamargo.util.InsertarEditarDatos;
 import org.hibernate.ObjectNotFoundException;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.event.*;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.text.SimpleAttributeSet;
@@ -150,6 +148,12 @@ public class VentanaPrincipal {
     private JTextField t_estNombreProvMasPiezasDistintas;
 
     private boolean filtrarEstadisticas = true;
+
+    // Creditos
+    private JLabel creditosFondo;
+    private JLabel creditos1;
+    private JLabel creditos2;
+    private HiloCreditos hc = new HiloCreditos();
 
     // Dimensiones
     private final Dimension dimPanelDatos = new Dimension(700, 500);
@@ -1246,6 +1250,33 @@ public class VentanaPrincipal {
         }
 
         foto.setIcon(new ImageIcon(gif));
+    }
+
+    // AYUDA
+    public void cargarVentanaCreditos() {
+        try {
+            panelDatos.removeAll();
+            panelDatos.repaint();
+        } catch (Exception ignored) { }
+
+        panelDatos.setLayout(null);
+        confPanel(panelDatos);
+
+        creditos1 = new JLabel();
+        panelDatos.add(creditos1);
+        creditos1.setBounds(0, 0, dimPanelDatos.width, dimPanelDatos.height);
+
+        creditos2 = new JLabel();
+        panelDatos.add(creditos2);
+        creditos2.setBounds(0, 0, dimPanelDatos.width, dimPanelDatos.height);
+
+        creditosFondo = new JLabel();
+        panelDatos.add(creditosFondo);
+        creditosFondo.setBounds(0, 0, dimPanelDatos.width, dimPanelDatos.height);
+
+        System.out.println("Créditos\n");
+        hc = new HiloCreditos(creditosFondo, creditos1, creditos2);
+        hc.start();
     }
 
     // ADMINISTRACIÓN GESTIÓN
@@ -3207,6 +3238,28 @@ public class VentanaPrincipal {
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Configurar Menú
+    public void menuAyuda(JMenuBar menuBar) {
+        JMenu menu;
+
+        menu = new JMenu("Ayuda");
+        menu.getAccessibleContext().setAccessibleDescription(
+                "Muestra información sobre la aplicación y su autor");
+        menuBar.add(menu);
+
+        menu.addMenuListener(new MenuListener() {
+            @Override
+            public void menuSelected(MenuEvent e) {
+                if (numVentana != 17) {
+                    numVentana = 17;
+                    cargarVentanaCreditos();
+                }
+            }
+            @Override
+            public void menuDeselected(MenuEvent e) { }
+            @Override
+            public void menuCanceled(MenuEvent e) { }
+        });
+    }
     public void menuGestionGlobal(JMenuBar menuBar) {
         JMenu menu;
         JMenuItem menuItem;
@@ -3221,6 +3274,7 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                hc.parar();
                 if (numVentana != 14) {
                     numVentana = 14;
                     cargarVentanaAdministracionGestion();
@@ -3233,6 +3287,7 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                hc.parar();
                 if (numVentana != 15) {
                     numVentana = 15;
                     cargarVentanaSuministros();
@@ -3245,6 +3300,7 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                hc.parar();
                 if (numVentana != 16) {
                     numVentana = 16;
                     cargarVentanaEstadisticas();
@@ -3266,6 +3322,7 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                hc.parar();
                 if (numVentana != 10) {
                     numVentana = 10;
                     cargarVentanaProyectoGestion();
@@ -3281,6 +3338,7 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                hc.parar();
                 if (numVentana != 11) {
                     System.out.println("Proyectos: Búsqueda por Código");
                     numVentana = 11;
@@ -3293,6 +3351,7 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                hc.parar();
                 if (numVentana != 12) {
                     System.out.println("Proyectos: Búsqueda por Nombre");
                     numVentana = 12;
@@ -3305,6 +3364,7 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                hc.parar();
                 if (numVentana != 13) {
                     System.out.println("Proyectos: Búsqueda por Ciudad");
                     numVentana = 13;
@@ -3329,6 +3389,7 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                hc.parar();
                 if (numVentana != 7) {
                     numVentana = 7;
                     cargarVentanaPiezaGestion();
@@ -3344,6 +3405,7 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                hc.parar();
                 if (numVentana != 8) {
                     System.out.println("Piezas: Búsqueda por Código");
                     numVentana = 8;
@@ -3357,6 +3419,7 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                hc.parar();
                 if (numVentana != 9) {
                     System.out.println("Piezas: Búsqueda por Nombre");
                     numVentana = 9;
@@ -3381,6 +3444,7 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                hc.parar();
                 if (numVentana != 3) {
                     numVentana = 3;
                     cargarVentanaProveedorGestion();
@@ -3396,6 +3460,7 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                hc.parar();
                 if (numVentana != 4) {
                     System.out.println("Proveedores: Búsqueda por Código");
                     numVentana = 4;
@@ -3409,6 +3474,7 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                hc.parar();
                 if (numVentana != 5) {
                     System.out.println("Proveedores: Búsqueda por Nombre");
                     numVentana = 5;
@@ -3422,6 +3488,7 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                hc.parar();
                 if (numVentana != 6) {
                     System.out.println("Proveedores: Búsqueda por Dirección");
                     numVentana = 6;
@@ -3444,6 +3511,7 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                hc.parar();
                 if (numVentana != 1) {
                     numVentana = 1;
                     cargarVentanaInicio(1);
@@ -3457,6 +3525,7 @@ public class VentanaPrincipal {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                hc.parar();
                 if (numVentana != 2) {
                     numVentana = 2;
                     cargarVentanaInicio(2);
@@ -3488,6 +3557,9 @@ public class VentanaPrincipal {
 
         // Gestión Global
         menuGestionGlobal(menuBar);
+
+        // Ayuda
+        menuAyuda(menuBar);
 
         // Cargamos la barra de menú configurada en la ventana
         ventanaPrincipal.setJMenuBar(menuBar);
