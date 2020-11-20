@@ -2402,24 +2402,26 @@ public class VentanaPrincipal {
                 if (datosCorrectos) {
                     if (editarPieza.getText().equalsIgnoreCase("Editar")) {
                         int indexElegido = listaPiezas.getSelectedIndex();
-                        InsertarEditarDatos.saveUpdatePieza(construirPiezaConLosDatos(), 2);
-                        editarPiezaLista();
-                        reanudarVentanaPiezas();
-                        cargarListaPiezas();
-                        listaPiezas.setSelectedIndex(indexElegido);
+                        if (InsertarEditarDatos.saveUpdatePieza(construirPiezaConLosDatos(), 2)) {
+                            editarPiezaLista();
+                        }
+                            reanudarVentanaPiezas();
+                            cargarListaPiezas();
+                            listaPiezas.setSelectedIndex(indexElegido);
                     } else {
-                        InsertarEditarDatos.saveUpdatePieza(construirPiezaConLosDatos(), 1);
-                        addPiezaALista();
-                        if (indexPagPza == numPagsPza && listaPiezas.getLastVisibleIndex() == numPzasPorPagLista - 1)
-                            indexPagPza++;
-                        else
-                            indexPagPza = numPagsPza;
-                        if (indexPagPza == 0)
-                            indexPagPza = 1;
-                        reanudarVentanaPiezas();
-                        cargarListaPiezas();
-                        listaPiezas.setSelectedIndex(listaPiezas.getLastVisibleIndex());
-                        borrarPieza.setEnabled(true);
+                        if (InsertarEditarDatos.saveUpdatePieza(construirPiezaConLosDatos(), 1)) {
+                            addPiezaALista();
+                            if (indexPagPza == numPagsPza && listaPiezas.getLastVisibleIndex() == numPzasPorPagLista - 1)
+                                indexPagPza++;
+                            else
+                                indexPagPza = numPagsPza;
+                            if (indexPagPza == 0)
+                                indexPagPza = 1;
+                            borrarPieza.setEnabled(true);
+                        }
+                            reanudarVentanaPiezas();
+                            cargarListaPiezas();
+                            listaPiezas.setSelectedIndex(listaPiezas.getLastVisibleIndex());
                     }
                 }
             }
@@ -2719,24 +2721,27 @@ public class VentanaPrincipal {
                 if (datosCorrectos) {
                     if (editarProyecto.getText().equalsIgnoreCase("Editar")) {
                         int indexElegido = listaProyectos.getSelectedIndex();
-                        InsertarEditarDatos.saveUpdateProyecto(construirProyectoConLosDatos(), 2);
-                        editarProyectoLista();
+                        if (InsertarEditarDatos.saveUpdateProyecto(construirProyectoConLosDatos(), 2)) {
+                            editarProyectoLista();
+                        }
                         reanudarVentanaProyectos();
                         cargarListaProyectos();
                         listaProyectos.setSelectedIndex(indexElegido);
                     } else {
-                        InsertarEditarDatos.saveUpdateProyecto(construirProyectoConLosDatos(), 1);
-                        addProyectoALista();
-                        if (indexPagProy == numPagsProy && listaProyectos.getLastVisibleIndex() == numProysPorPagLista - 1)
-                            indexPagProy++;
-                        else
-                            indexPagProy = numPagsProy;
-                        if (indexPagProy == 0)
-                            indexPagProy = 1;
+                        if (InsertarEditarDatos.saveUpdateProyecto(construirProyectoConLosDatos(), 1)) {
+                            addProyectoALista();
+                            if (indexPagProy == numPagsProy && listaProyectos.getLastVisibleIndex() == numProysPorPagLista - 1)
+                                indexPagProy++;
+                            else
+                                indexPagProy = numPagsProy;
+                            if (indexPagProy == 0)
+                                indexPagProy = 1;
+                            borrarProyecto.setEnabled(true);
+                        }
                         reanudarVentanaProyectos();
                         cargarListaProyectos();
                         listaProyectos.setSelectedIndex(listaProyectos.getLastVisibleIndex());
-                        borrarProyecto.setEnabled(true);
+
                     }
                 }
             }
@@ -3027,24 +3032,26 @@ public class VentanaPrincipal {
                 if (datosCorrectos) {
                     if (editarProveedor.getText().equalsIgnoreCase("Editar")) {
                         int indexElegido = listaProveedores.getSelectedIndex();
-                        InsertarEditarDatos.saveUpdateProveedor(construirProveedorConLosDatos(), 2);
-                        editarProveedorLista();
+                        if (InsertarEditarDatos.saveUpdateProveedor(construirProveedorConLosDatos(), 2)) {
+                            editarProveedorLista();
+                        }
                         reanudarVentanaProveedores();
                         cargarListaProveedores();
                         listaProveedores.setSelectedIndex(indexElegido);
                     } else {
-                        InsertarEditarDatos.saveUpdateProveedor(construirProveedorConLosDatos(), 1);
-                        addProveedorALista();
-                        if (indexPagProv == numPagsProv && listaProveedores.getLastVisibleIndex() == numProvsPorPagLista - 1)
-                            indexPagProv++;
-                        else
-                            indexPagProv = numPagsProv;
-                        if (indexPagProv == 0)
-                            indexPagProv = 1;
+                        if (InsertarEditarDatos.saveUpdateProveedor(construirProveedorConLosDatos(), 1)) {
+                            addProveedorALista();
+                            if (indexPagProv == numPagsProv && listaProveedores.getLastVisibleIndex() == numProvsPorPagLista - 1)
+                                indexPagProv++;
+                            else
+                                indexPagProv = numPagsProv;
+                            if (indexPagProv == 0)
+                                indexPagProv = 1;
+                            borrarProveedor.setEnabled(true);
+                        }
                         reanudarVentanaProveedores();
                         cargarListaProveedores();
                         listaProveedores.setSelectedIndex(listaProveedores.getLastVisibleIndex());
-                        borrarProveedor.setEnabled(true);
                     }
                 }
             }

@@ -77,6 +77,11 @@ public class InsertarEditarDatos {
                     mostrarJOptionPane(titulo, mensaje, 0);
                     System.out.println("Error al insertar/editar. No existe la gestión en cuestión");
                     accionCompletada = false;
+                } catch (ObjectNotFoundException ex) {
+                    String mensaje = "Error al editar. No existe el objeto. Error:\n" + ex.getLocalizedMessage();
+                    mostrarJOptionPane(titulo, mensaje, 0);
+                    System.out.println("Error al editar. No existe el objeto. Error\n" + ex.getLocalizedMessage());
+                    accionCompletada = false;
                 } catch (ConstraintViolationException ex) {
                     String mensaje = "Error al insertar/editar. Se está incumpliendo la constraint:\n" + ex.getLocalizedMessage();
                     mostrarJOptionPane(titulo, mensaje, 0);
@@ -143,6 +148,11 @@ public class InsertarEditarDatos {
                     mostrarJOptionPane(titulo, mensaje, 0);
                     System.out.println("Error al insertar/editar. No existe el proveedor en cuestión");
                     accionCompletada = false;
+                } catch (ObjectNotFoundException ex) {
+                    String mensaje = "Error al editar. No existe el objeto. Error:\n" + ex.getLocalizedMessage();
+                    mostrarJOptionPane(titulo, mensaje, 0);
+                    System.out.println("Error al editar. No existe el objeto. Error\n" + ex.getLocalizedMessage());
+                    accionCompletada = false;
                 } catch (ConstraintViolationException ex) {
                     String mensaje = "Error al insertar/editar. Se está incumpliendo la constraint:\n" + ex.getLocalizedMessage();
                     mostrarJOptionPane(titulo, mensaje, 0);
@@ -208,6 +218,11 @@ public class InsertarEditarDatos {
                     String mensaje = "Error al insertar/editar. No existe la pieza en cuestión";
                     mostrarJOptionPane(titulo, mensaje, 0);
                     System.out.println("Error al insertar/editar. No existe la pieza en cuestión");
+                    accionCompletada = false;
+                }  catch (ObjectNotFoundException ex) {
+                    String mensaje = "Error al editar. No existe el objeto. Error:\n" + ex.getLocalizedMessage();
+                    mostrarJOptionPane(titulo, mensaje, 0);
+                    System.out.println("Error al editar. No existe el objeto. Error\n" + ex.getLocalizedMessage());
                     accionCompletada = false;
                 } catch (ConstraintViolationException ex) {
                     String mensaje = "Error al insertar/editar. Se está incumpliendo la constraint:\n" + ex.getLocalizedMessage();

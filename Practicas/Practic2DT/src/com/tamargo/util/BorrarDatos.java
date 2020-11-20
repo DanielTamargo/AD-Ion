@@ -63,6 +63,11 @@ public class BorrarDatos {
                     mostrarJOptionPane(titulo, mensaje, 0);
                     System.out.println("Error al eliminar. No existe la gestion en cuestión");
                     eliminado = false;
+                } catch (ObjectNotFoundException ex) {
+                    String mensaje = "Error al eliminar. No existe el objeto. Error:\n" + ex.getLocalizedMessage();
+                    mostrarJOptionPane(titulo, mensaje, 0);
+                    System.out.println("Error al eliminar. No existe el objeto. Error\n" + ex.getLocalizedMessage());
+                    eliminado = false;
                 } catch (ConstraintViolationException ex) {
                     String mensaje = "Error al eliminar. Se está incumpliendo la constraint:\n" + ex.getLocalizedMessage();
                     mostrarJOptionPane(titulo, mensaje, 0);
@@ -119,6 +124,11 @@ public class BorrarDatos {
                     mostrarJOptionPane(titulo, mensaje, 0);
                     System.out.println("Error al eliminar. No existe el proveedor en cuestión");
                     eliminado = false;
+                } catch (ObjectNotFoundException ex) {
+                    String mensaje = "Error al eliminar. No existe el objeto. Error:\n" + ex.getLocalizedMessage();
+                    mostrarJOptionPane(titulo, mensaje, 0);
+                    System.out.println("Error al eliminar. No existe el objeto. Error\n" + ex.getLocalizedMessage());
+                    eliminado = false;
                 } catch (ConstraintViolationException ex) {
                     String mensaje = "Error al eliminar. Se está incumpliendo la constraint:\n" + ex.getLocalizedMessage();
                     mostrarJOptionPane(titulo, mensaje, 0);
@@ -174,6 +184,11 @@ public class BorrarDatos {
                     String mensaje = "Error al eliminar. No existe la pieza en cuestión";
                     mostrarJOptionPane(titulo, mensaje, 0);
                     System.out.println("Error al eliminar. No existe la pieza en cuestión");
+                    eliminado = false;
+                } catch (ObjectNotFoundException ex) {
+                    String mensaje = "Error al eliminar. No existe el objeto. Error:\n" + ex.getLocalizedMessage();
+                    mostrarJOptionPane(titulo, mensaje, 0);
+                    System.out.println("Error al eliminar. No existe el objeto. Error\n" + ex.getLocalizedMessage());
                     eliminado = false;
                 } catch (ConstraintViolationException ex) {
                     String mensaje = "Error al eliminar. Se está incumpliendo la constraint:\n" + ex.getLocalizedMessage();
