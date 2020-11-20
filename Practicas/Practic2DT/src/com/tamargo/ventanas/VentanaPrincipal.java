@@ -1635,7 +1635,7 @@ public class VentanaPrincipal {
 
         anchuraLabel = 140;
 
-        JLabel l_numPiezas = new JLabel("Num. Piezas", SwingConstants.RIGHT);
+        JLabel l_numPiezas = new JLabel("Num. Piezas distintas", SwingConstants.RIGHT);
         confLabel(l_numPiezas);
         panelDatos.add(l_numPiezas);
         l_numPiezas.setBounds(0, posY + 40, anchuraLabel, dimLabel.height);
@@ -3021,7 +3021,7 @@ public class VentanaPrincipal {
 
                 } else {
                     reanudarVentanaProveedores();
-                    listaProveedores.setSelectedIndex(0);
+                       listaProveedores.setSelectedIndex(0);
                 }
             }
         });

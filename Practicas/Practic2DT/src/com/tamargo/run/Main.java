@@ -13,9 +13,15 @@ public class Main {
     private static boolean iniciar = true;
 
     public static void main(String[] args) {
+        comprobarHibernate();
+
+        if (iniciar)
+            VentanaPrincipal.main(args);
+
+    }
+
+    public static void comprobarHibernate() {
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-
-
 
         if (sessionFactory == null) {
             JButton cerrarAplicacion = new JButton("Cerrar aplicación");
@@ -52,13 +58,7 @@ public class Main {
                 }
             });
             dialog.setVisible(true);
-
-
         }
-
-        if (iniciar)
-            VentanaPrincipal.main(args);
-
     }
 
 }
